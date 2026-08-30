@@ -5,16 +5,19 @@ import { PermissionScreen } from './src/screens/PermissionScreen';
 import { ScanningScreen } from './src/screens/ScanningScreen';
 import { VerdictScreen } from './src/screens/VerdictScreen';
 import { ResultsScreen } from './src/screens/ResultsScreen';
+import { ExecutingScreen } from './src/screens/ExecutingScreen';
 import { MessageScreen } from './src/screens/MessageScreen';
 import { useScan } from './src/lib/useScan';
 import { PermissionState, getPhotoPermission, requestPhotoPermission } from './src/lib/screenshots';
 import { actionableCount } from './src/lib/verdict';
+import { ActionOutcome, buildSteps } from './src/lib/actions';
 
-type Stage = 'permission' | 'verdict' | 'results';
+type Stage = 'permission' | 'verdict' | 'executing' | 'results';
 
 export default function App() {
   const [permission, setPermission] = useState<PermissionState>('undetermined');
   const [stage, setStage] = useState<Stage>('permission');
+  const [outcomes, setOutcomes] = useState<ActionOutcome[]>([]);
   const scan = useScan();
 
   useEffect(() => {
@@ -30,7 +33,13 @@ export default function App() {
   }, [permission, scan]);
 
   const rescan = useCallback(() => {
+    setOutcomes([]);
     setStage('permission');
+  }, []);
+
+  const finishExecuting = useCallback((results: ActionOutcome[]) => {
+    setOutcomes(results);
+    setStage('results');
   }, []);
 
   const body = () => {
@@ -65,8 +74,19 @@ export default function App() {
       );
     }
 
+    if (stage === 'executing') {
+      return <ExecutingScreen steps={buildSteps(scan.items)} onDone={finishExecuting} />;
+    }
+
     if (stage === 'results') {
-      return <ResultsScreen items={scan.items} onRescan={rescan} />;
+      return (
+        <ResultsScreen
+          items={scan.items}
+          outcomes={outcomes}
+          totalValue={scan.totalValue}
+          onRescan={rescan}
+        />
+      );
     }
 
     return (
@@ -75,7 +95,7 @@ export default function App() {
         counts={scan.counts}
         verdictLine={scan.verdictLine}
         actionable={actionableCount(scan.items)}
-        onFix={() => setStage('results')}
+        onFix={() => setStage('executing')}
       />
     );
   };

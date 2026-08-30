@@ -16,6 +16,13 @@ interface Props {
   /** One slot per look, filled as each render lands. */
   tryOns: (string | null)[];
   tryOnErrors: (string | null)[];
+  /**
+   * Which look is open, held by the parent so the hardware back gesture can
+   * close it. Kept here it was invisible to the app's back handler, which
+   * restarted the whole flow instead of returning to the deck.
+   */
+  selected: number | null;
+  onSelect: (index: number | null) => void;
   onRestart: () => void;
 }
 
@@ -62,9 +69,8 @@ function Swatches({ items }: { items: { hex: string; name: string }[] }) {
   );
 }
 
-export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onRestart }: Props) {
+export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, selected, onSelect, onRestart }: Props) {
   const { width } = useWindowDimensions();
-  const [selected, setSelected] = useState<number | null>(null);
   const [band, setBand] = useState<PriceBandId>(DEFAULT_BAND);
 
   React.useEffect(() => {
@@ -82,7 +88,7 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onR
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: space.lg }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={type.caption}>{look.register}</Text>
-            <Pressable onPress={() => setSelected(null)} hitSlop={10}>
+            <Pressable onPress={() => onSelect(null)} hitSlop={10}>
               <Chip label="All looks" />
             </Pressable>
           </View>
@@ -155,7 +161,7 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onR
         <LookDeck
           original={original}
           gutter={space.lg}
-          onOpen={setSelected}
+          onOpen={onSelect}
           items={analysis.outfits.map((look, i) => ({
             key: look.register,
             label: look.register,

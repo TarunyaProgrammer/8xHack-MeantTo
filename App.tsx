@@ -22,6 +22,7 @@ export default function App() {
   const [stage, setStage] = useState<Stage>('permission');
   const [photo, setPhoto] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const [selectedLook, setSelectedLook] = useState<number | null>(null);
   const [tryOns, setTryOns] = useState<(string | null)[]>([]);
   const [tryOnErrors, setTryOnErrors] = useState<(string | null)[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -52,6 +53,7 @@ export default function App() {
   const restart = useCallback(() => {
     setPhoto(null);
     setAnalysis(null);
+    setSelectedLook(null);
     setTryOns([]);
     setTryOnErrors([]);
     setStage('pick');
@@ -60,6 +62,7 @@ export default function App() {
   const openLook = useCallback((look: Look) => {
     setPhoto(look.photo);
     setAnalysis(look.analysis);
+    setSelectedLook(null);
     setTryOns(look.tryOn ? [look.tryOn] : []);
     setTryOnErrors([]);
     setPage('flow');
@@ -69,6 +72,7 @@ export default function App() {
   const onPick = useCallback(async (uri: string) => {
     setPhoto(uri);
     setStage('analysing');
+    setSelectedLook(null);
     setTryOns([]);
     setTryOnErrors([]);
 
@@ -168,6 +172,8 @@ export default function App() {
           analysis={analysis}
           tryOns={tryOns}
           tryOnErrors={tryOnErrors}
+          selected={selectedLook}
+          onSelect={setSelectedLook}
           onRestart={restart}
         />
       );
@@ -195,6 +201,11 @@ export default function App() {
       return true;
     }
     if (stage === 'result') {
+      // An open look closes back to the deck before the flow restarts.
+      if (selectedLook !== null) {
+        setSelectedLook(null);
+        return true;
+      }
       restart();
       return true;
     }
@@ -204,7 +215,7 @@ export default function App() {
     }
     // Landing: nothing above us, so let the OS take it.
     return false;
-  }, [page, stage, restart]);
+  }, [page, stage, selectedLook, restart]);
 
   useEffect(() => {
     const sub = BackHandler.addEventListener('hardwareBackPress', goBack);

@@ -55,7 +55,7 @@ no mock mode, no demo mode, no seeded fixtures and no sample fallback.
 
 ```bash
 npm install
-cp .env.example .env      # add your Anthropic API key
+cp .env.example .env      # add your OpenAI API key
 npx expo start
 ```
 
@@ -73,12 +73,12 @@ demo build only. A real release puts it behind a proxy.
 
 Expo SDK 54 · React Native 0.81 · TypeScript · Reanimated · react-native-svg · zod
 
-The Messages API is called directly over `fetch`. The official Anthropic SDK
-imports `node:fs`, `node:path` and `node:crypto` at module load, none of which
-Metro can resolve for React Native — shimming four Node builtins is more
-fragile than a small client, so this talks to the API directly. Structured
-output still uses a strict JSON Schema generated from zod, and every response
-is validated against it.
+Vision extraction runs on OpenAI `gpt-4o-mini` through the Chat Completions
+API, called directly over `fetch`. Official provider SDKs import Node builtins
+at module load, which Metro cannot resolve for React Native, so a small direct
+client is less fragile than shimming those. Structured output uses a strict
+JSON Schema generated from the zod schema, and every response is validated
+against it before use.
 
 Local-only persistence through AsyncStorage, keyed by MediaLibrary `assetId` so
 a screenshot is never extracted twice.

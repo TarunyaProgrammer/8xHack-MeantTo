@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Item, ItemType, emptyCounts } from '../types';
-import { MissingKeyError } from './anthropic';
+import { MissingKeyError } from './ai';
 import { extractAll } from './extract';
 import { SCAN_LIMIT, countScreenshots, listScreenshots } from './screenshots';
 import { loadItems, saveItems, saveSession } from './storage';

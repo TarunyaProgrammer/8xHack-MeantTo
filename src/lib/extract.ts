@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { SaveFormat, manipulateAsync } from 'expo-image-manipulator';
-import { askStructured } from './anthropic';
+import { askStructured, imagePart, textPart } from './ai';
 import { Screenshot } from './screenshots';
 import { Item, ItemType } from '../types';
 
@@ -67,8 +67,8 @@ async function extractOne(shot: Screenshot): Promise<Item> {
   const data = await toBase64(shot.uri);
 
   const parsed = await askStructured(ExtractionSchema, SYSTEM, [
-    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data } },
-    { type: 'text', text: 'What did this screenshot mean to do?' },
+    imagePart(data),
+    textPart('What did this screenshot mean to do?'),
   ]);
 
   return {

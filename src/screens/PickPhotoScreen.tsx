@@ -21,9 +21,10 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
 
   return (
     <Screen>
-      <Text style={type.display}>Pick a full-body photo</Text>
-      <Text style={[type.bodyMuted, { marginTop: 4, marginBottom: space.lg }]}>
-        Head to feet, plain background.
+      <Text style={type.caption}>Step one</Text>
+      <Text style={[type.display, { marginTop: 6 }]}>FULL{'\n'}BODY</Text>
+      <Text style={[type.bodyMuted, { marginTop: space.sm, marginBottom: space.lg }]}>
+        Head to feet. Plain wall.
       </Text>
 
       <ScrollView showsVerticalScrollIndicator={false}>

@@ -2,21 +2,30 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { color, radius, space } from '../theme/tokens';
 
-export function Chip({ label }: { label: string }) {
+interface Props {
+  label: string;
+  tone?: 'default' | 'accent' | 'hot';
+}
+
+export function Chip({ label, tone = 'default' }: Props) {
+  const fill =
+    tone === 'accent' ? color.accent : tone === 'hot' ? color.hot : color.surfaceHi;
+  const ink = tone === 'accent' ? color.bg : color.ink;
   return (
-    <View style={styles.chip}>
-      <Text style={styles.label}>{label}</Text>
+    <View style={[styles.chip, { backgroundColor: fill }]}>
+      <Text style={[styles.label, { color: tone === 'default' ? color.muted : ink }]}>
+        {label}
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   chip: {
-    backgroundColor: color.surface,
     borderRadius: radius.chip,
     paddingHorizontal: space.sm,
-    paddingVertical: 6,
+    paddingVertical: 7,
     alignSelf: 'flex-start',
   },
-  label: { fontSize: 13, fontWeight: '500', color: color.muted },
+  label: { fontSize: 12, fontWeight: '800', letterSpacing: 0.3, textTransform: 'uppercase' },
 });

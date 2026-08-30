@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
-import { Card, GhostButton, Screen } from '../components';
+import { Chip, Card, GhostButton, Screen } from '../components';
 import { WhereToBuy } from '../components/WhereToBuy';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
@@ -25,18 +25,18 @@ function Swatches({ items }: { items: { hex: string; name: string }[] }) {
   return (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.xs }}>
       {items.map((c) => (
-        <View key={c.hex + c.name} style={{ alignItems: 'center', width: 62 }}>
+        <View key={c.hex + c.name} style={{ alignItems: 'center', width: 78 }}>
           <View
             style={{
-              width: 46,
-              height: 46,
-              borderRadius: radius.chip,
+              width: 62,
+              height: 62,
+              borderRadius: radius.tile,
               backgroundColor: c.hex,
               borderWidth: 1,
-              borderColor: color.border,
+              borderColor: color.borderHi,
             }}
           />
-          <Text style={{ fontSize: 11, color: color.muted, marginTop: 4 }} numberOfLines={2}>
+          <Text style={{ fontSize: 11, fontWeight: '600', color: color.muted, marginTop: 6 }} numberOfLines={2}>
             {c.name}
           </Text>
         </View>
@@ -71,10 +71,12 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md }}>
         <View>
-          <Text style={type.display}>{analysis.season}</Text>
-          <Text style={type.bodyMuted}>
-            {analysis.undertone} · {analysis.contrast} contrast
-          </Text>
+          <Text style={type.caption}>Your season</Text>
+          <Text style={[type.mega, { marginTop: 6 }]}>{analysis.season.toUpperCase()}</Text>
+          <View style={{ flexDirection: 'row', gap: 6, marginTop: space.sm, flexWrap: 'wrap' }}>
+            <Chip label={analysis.undertone} tone="accent" />
+            <Chip label={`${analysis.contrast} contrast`} />
+          </View>
         </View>
 
         {/* The try-on renders behind the analysis so there is no dead air. */}
@@ -105,8 +107,9 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
           )}
         </Card>
 
-        <Card>
-          <Text style={type.h2}>{analysis.outfit.top}</Text>
+        <Card hero>
+          <Text style={type.caption}>The fit</Text>
+          <Text style={[type.h1, { marginTop: 6 }]}>{analysis.outfit.top}</Text>
           {/* Read loosely: the analysis schema may gain or rename garment slots,
               and anything the try-on renders must also be named here. */}
           {(['bottom', 'shoes', 'outerwear', 'accessory'] as const)
@@ -125,9 +128,9 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
         <WhereToBuy garments={garments} band={band} onChangeBand={onChangeBand} />
 
         <Card>
-          <Text style={[type.caption, { marginBottom: space.sm }]}>Your colours</Text>
+          <Text style={[type.caption, { marginBottom: space.md }]}>Wear these</Text>
           <Swatches items={analysis.palette} />
-          <Text style={[type.caption, { marginTop: space.md, marginBottom: space.sm }]}>Avoid</Text>
+          <Text style={[type.caption, { marginTop: space.lg, marginBottom: space.md }]}>Never these</Text>
           <Swatches items={analysis.avoid} />
         </Card>
 

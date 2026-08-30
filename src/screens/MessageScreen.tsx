@@ -18,7 +18,7 @@ export function MessageScreen({ title, detail, actionLabel, onAction, tone = 'ne
     <Screen center>
       <View style={{ alignItems: 'center' }}>
         {tone === 'error' && <Icon name="alert" size={28} color={color.danger} />}
-        <Text style={[type.h1, { marginTop: space.md, textAlign: 'center' }]}>{title}</Text>
+        <Text style={[type.display, { marginTop: space.md, textAlign: 'center' }]}>{title}</Text>
         {detail ? (
           <Text style={[type.bodyMuted, { marginTop: space.xs, textAlign: 'center' }]}>
             {detail}

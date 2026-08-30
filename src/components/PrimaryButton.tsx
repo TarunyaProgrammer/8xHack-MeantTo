@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, Text, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { color, radius } from '../theme/tokens';
+import { color, radius, shadow } from '../theme/tokens';
 
 interface Props {
   label: string;
@@ -9,10 +9,15 @@ interface Props {
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
+  tone?: 'accent' | 'hot';
 }
 
-export function PrimaryButton({ label, onPress, disabled, loading, style }: Props) {
+export function PrimaryButton({ label, onPress, disabled, loading, style, tone = 'accent' }: Props) {
   const inactive = disabled || loading;
+  const fill = tone === 'hot' ? color.hot : color.accent;
+  // Ink on lime, white on magenta — both well past the contrast floor.
+  const label_ = tone === 'hot' ? color.ink : color.bg;
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -25,7 +30,8 @@ export function PrimaryButton({ label, onPress, disabled, loading, style }: Prop
       }}
       style={({ pressed }) => [
         styles.button,
-        inactive && styles.inactive,
+        { backgroundColor: inactive ? color.surfaceHi : fill },
+        !inactive && shadow.glow,
         pressed && !inactive && styles.pressed,
         style,
       ]}
@@ -33,7 +39,7 @@ export function PrimaryButton({ label, onPress, disabled, loading, style }: Prop
       {loading ? (
         <ActivityIndicator color={color.bg} />
       ) : (
-        <Text style={styles.label}>{label}</Text>
+        <Text style={[styles.label, { color: inactive ? color.faint : label_ }]}>{label}</Text>
       )}
     </Pressable>
   );
@@ -41,13 +47,12 @@ export function PrimaryButton({ label, onPress, disabled, loading, style }: Prop
 
 const styles = StyleSheet.create({
   button: {
-    height: 56,
+    height: 60,
     borderRadius: radius.button,
-    backgroundColor: color.accent,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 28,
   },
-  pressed: { opacity: 0.88 },
-  inactive: { backgroundColor: color.border },
-  label: { fontSize: 17, fontWeight: '600', color: color.bg },
+  pressed: { transform: [{ scale: 0.97 }], opacity: 0.9 },
+  label: { fontSize: 17, fontWeight: '800', letterSpacing: -0.2 },
 });

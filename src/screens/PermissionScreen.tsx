@@ -1,6 +1,6 @@
 import React from 'react';
 import { Linking, Text, View } from 'react-native';
-import { PrimaryButton, GhostButton, Screen } from '../components';
+import { Chip, GhostButton, PrimaryButton, Screen } from '../components';
 import { color, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { PermissionState } from '../lib/screenshots';
@@ -18,17 +18,16 @@ export function PermissionScreen({ permission, onScan, onCamera }: Props) {
   return (
     <Screen center>
       <View style={{ marginBottom: space.xxl }}>
-        <Text style={type.display}>Fitted</Text>
-        <Text style={[type.bodyMuted, { marginTop: space.xs }]}>
-          Your colours, from your own photo.
+        <Chip label="Colour · Fit · Try-on" tone="accent" />
+        <Text style={[type.mega, { marginTop: space.md }]}>YOUR{'\n'}COLOURS</Text>
+        <Text style={[type.body, { color: color.muted, marginTop: space.md }]}>
+          One photo. Real answers.
         </Text>
       </View>
 
       {blocked ? (
         <>
-          <Text style={[type.body, { color: color.muted, marginBottom: space.md }]}>
-            Photo access is off.
-          </Text>
+          <Text style={[type.bodyMuted, { marginBottom: space.md }]}>Photo access is off.</Text>
           <PrimaryButton label="Take a photo instead" onPress={onCamera} />
           <GhostButton
             label="Open Settings"
@@ -37,7 +36,7 @@ export function PermissionScreen({ permission, onScan, onCamera }: Props) {
           />
         </>
       ) : (
-        <PrimaryButton label="Get started" onPress={onScan} />
+        <PrimaryButton label="Start" onPress={onScan} />
       )}
     </Screen>
   );

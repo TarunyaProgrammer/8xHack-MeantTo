@@ -1,23 +1,41 @@
 /**
- * Design tokens. One accent colour, white surfaces, very soft shadows.
- * Do not add a second accent — the whole look depends on restraint.
+ * Design tokens — bold, high-contrast, editorial.
+ *
+ * Near-black canvas is a functional choice as much as an aesthetic one: this
+ * app's whole job is showing colour, and swatches read far more accurately
+ * against black than against white. White-on-near-black is also the highest
+ * contrast text pairing available, which keeps a loud UI readable.
  */
 
 export const color = {
-  bg: '#FFFFFF',
-  surface: '#F7F8FA',
-  ink: '#0B1B2B',
-  muted: '#6B7280',
-  accent: '#0B5FFF',
-  success: '#12B76A',
-  danger: '#E5484D',
-  border: '#ECEEF2',
+  bg: '#0A0A0F',
+  /** Raised panels. Deliberately close to bg — separation comes from the hairline. */
+  surface: '#15151F',
+  surfaceHi: '#1E1E2B',
+
+  ink: '#FFFFFF',
+  muted: '#8E8EA3',
+  faint: '#5A5A6E',
+
+  /** Acid lime. Primary action, live values, anything the eye should hit first. */
+  accent: '#CCFF00',
+  /** Hot magenta. Energy and emphasis only — never load-bearing for meaning. */
+  hot: '#FF2D9B',
+  /** Electric violet. Third voice for gradients and highlights. */
+  violet: '#7C5CFF',
+
+  success: '#3DFFA8',
+  danger: '#FF4D5E',
+
+  border: '#26263A',
+  borderHi: '#3A3A55',
 } as const;
 
 export const radius = {
-  card: 20,
-  button: 14,
+  card: 26,
+  button: 999,
   chip: 999,
+  tile: 18,
 } as const;
 
 export const space = {
@@ -29,14 +47,21 @@ export const space = {
   xxl: 48,
 } as const;
 
-/** Barely-there elevation. Anything heavier reads as a template. */
+/** Glow rather than drop shadow — a dark canvas swallows conventional elevation. */
 export const shadow = {
   card: {
-    shadowColor: '#0B1B2B',
-    shadowOpacity: 0.06,
+    shadowColor: '#000000',
+    shadowOpacity: 0.5,
     shadowRadius: 24,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 2,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
+  },
+  glow: {
+    shadowColor: color.accent,
+    shadowOpacity: 0.35,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 8,
   },
 } as const;
 

@@ -19,12 +19,16 @@ export const color = {
   muted: '#7A7167',
   faint: '#A79C8E',
 
-  /** Electric cobalt. Primary action. Sings against bone. */
-  accent: '#2340FF',
-  /** Vivid coral. Emphasis and energy, never load-bearing for meaning. */
-  hot: '#FF4A26',
-  /** Violet, third voice. */
-  violet: '#6B4EFF',
+  /**
+   * Retail pink. The colour Indian shopping apps converge on because it reads
+   * as "act now" at a glance — cobalt is calm, and calm is the wrong register
+   * for a buy button.
+   */
+  accent: '#FF3F6C',
+  /** Marigold. Prices, badges, anything that should catch the eye second. */
+  hot: '#FF8A00',
+  /** Deep grape, third voice for tags and secondary fills. */
+  violet: '#7B2CBF',
 
   success: '#0E9F6E',
   danger: '#D92D20',

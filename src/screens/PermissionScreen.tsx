@@ -76,7 +76,7 @@ export function PermissionScreen({ permission, onScan, onCamera }: Props) {
       <Card style={{ marginTop: space.lg, paddingVertical: space.md }}>
         <View style={{ height: 86, justifyContent: 'center' }}>
           <Animated.View key={q} entering={FadeIn.duration(600)} exiting={FadeOut.duration(300)}>
-            <View style={{ width: 3, height: 20, backgroundColor: color.hot, marginBottom: space.xs }} />
+            <View style={{ width: 3, height: 20, backgroundColor: color.accent, marginBottom: space.xs }} />
             <Text style={[type.h2, { lineHeight: 25 }]}>{quote.text}</Text>
             {quote.by && <Text style={[type.caption, { marginTop: 6 }]}>{quote.by}</Text>}
           </Animated.View>

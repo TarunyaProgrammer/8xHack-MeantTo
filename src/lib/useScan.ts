@@ -48,9 +48,20 @@ export function useScan() {
       setState((s) => ({ ...s, totalScreenshots: total, progress: { done: 0, total: shots.length } }));
 
       const cached = await loadItems();
-      const items = await extractAll(shots, cached, (progress) =>
+      const { items, failed, firstError } = await extractAll(shots, cached, (progress) =>
         setState((s) => ({ ...s, progress }))
       );
+
+      // If nothing survived extraction, that is a failure to report — not a
+      // verdict claiming the folder held nothing worth doing.
+      if (failed >= shots.length && shots.length > 0) {
+        setState((s) => ({
+          ...s,
+          phase: 'error',
+          error: firstError ?? 'Every screenshot failed to process.',
+        }));
+        return;
+      }
 
       await saveItems(items);
 

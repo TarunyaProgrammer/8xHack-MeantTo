@@ -46,7 +46,22 @@ export interface Screenshot {
  * empty state rather than substituting anything.
  */
 export async function listScreenshots(limit = SCAN_LIMIT): Promise<Screenshot[]> {
+  const permission = await MediaLibrary.getPermissionsAsync();
   const album = await findScreenshotsAlbum();
+
+  // Diagnostics: an empty result is almost always permission scope or an
+  // album named something unexpected, and both are invisible without this.
+  console.log('[scan] permission', {
+    granted: permission.granted,
+    status: permission.status,
+    accessPrivileges: (permission as { accessPrivileges?: string }).accessPrivileges,
+  });
+  console.log('[scan] screenshots album', album ? album.title : 'NOT FOUND');
+
+  if (!album) {
+    const all = await MediaLibrary.getAlbumsAsync({ includeSmartAlbums: true });
+    console.log('[scan] albums on device:', all.map((a) => `${a.title}(${a.assetCount})`).join(', '));
+  }
 
   const page = await MediaLibrary.getAssetsAsync({
     first: limit,
@@ -54,6 +69,8 @@ export async function listScreenshots(limit = SCAN_LIMIT): Promise<Screenshot[]>
     mediaType: [MediaLibrary.MediaType.photo],
     ...(album ? { album } : {}),
   });
+
+  console.log('[scan] assets returned', page.assets.length, 'of total', page.totalCount);
 
   return page.assets.map((asset) => ({
     assetId: asset.id,

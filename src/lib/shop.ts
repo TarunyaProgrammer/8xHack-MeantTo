@@ -104,15 +104,10 @@ export interface Garment {
 }
 
 /** `why` is prose about the look, not something you can shop for. */
-const NOT_GARMENTS = new Set(['why', 'reason', 'rationale', 'note', 'notes', 'summary']);
 
 /** Known slots first; anything the analysis adds later lands after them. */
 const SLOT_ORDER = ['top', 'bottom', 'shoes'];
 
-function slotRank(key: string): number {
-  const i = SLOT_ORDER.indexOf(key.toLowerCase());
-  return i === -1 ? SLOT_ORDER.length : i;
-}
 
 /**
  * Read the shoppable garments off the outfit. Deliberately structural rather
@@ -120,18 +115,40 @@ function slotRank(key: string): number {
  * and may add outerwear or accessories, and those should appear here without
  * this file changing. Anything non-string or empty is skipped.
  */
+/**
+ * Only real, buyable garments — an explicit allowlist, deliberately not a
+ * denylist.
+ *
+ * This previously took every non-empty string on the outfit and excluded a few
+ * known prose fields. When the analysis schema later grew `occasion`,
+ * `formality`, `scheme`, `silhouette`, `fabric` and `fit`, those descriptors
+ * started appearing as shoppable rows — "business casual" is not something you
+ * can buy. A denylist silently breaks every time the schema grows; an
+ * allowlist fails closed.
+ */
+const GARMENT_SLOTS: { key: string; label: string; aliases: string[] }[] = [
+  { key: 'Top', label: 'Top', aliases: ['top', 'upper', 'shirt'] },
+  { key: 'Bottom', label: 'Bottom', aliases: ['bottom', 'lower', 'trousers', 'pants'] },
+  { key: 'Shoes', label: 'Shoes', aliases: ['shoes', 'footwear'] },
+  { key: 'Layer', label: 'Layer', aliases: ['outerwear', 'jacket', 'layer'] },
+  { key: 'Detail', label: 'Detail', aliases: ['accessory', 'accessories'] },
+];
+
 export function garmentsFrom(outfit: unknown): Garment[] {
   if (!outfit || typeof outfit !== 'object') return [];
+  const record = outfit as Record<string, unknown>;
 
-  return Object.entries(outfit as Record<string, unknown>)
-    .filter(
-      ([key, value]) =>
-        typeof value === 'string' &&
-        value.trim().length > 0 &&
-        !NOT_GARMENTS.has(key.toLowerCase()),
-    )
-    .sort(([a], [b]) => slotRank(a) - slotRank(b))
-    .map(([key, value]) => ({ key, description: (value as string).trim() }));
+  const garments: Garment[] = [];
+  for (const slot of GARMENT_SLOTS) {
+    for (const alias of slot.aliases) {
+      const value = record[alias];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        garments.push({ key: slot.key, description: value.trim() });
+        break;
+      }
+    }
+  }
+  return garments;
 }
 
 export interface ShopLink {

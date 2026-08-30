@@ -50,7 +50,7 @@ export function WhereToBuy({ garments, band, onChangeBand }: Props) {
               pressed && styles.pressed,
             ]}
           >
-            <Text style={styles.slot}>{garment.key.slice(0, 3).toUpperCase()}</Text>
+            <Text style={styles.slot}>{garment.key}</Text>
             <Text style={[type.body, styles.name]} numberOfLines={1}>
               {garment.description}
             </Text>
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   divider: { borderTopWidth: 1, borderTopColor: color.border },
   pressed: { opacity: 0.55 },
   slot: {
-    width: 30,
+    width: 46,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.8,

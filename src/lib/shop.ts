@@ -198,7 +198,10 @@ export function shopLinks(description: string, bandId: PriceBandId): ShopLink[] 
     },
     {
       retailer: 'Amazon',
-      url: `https://www.amazon.in/s?k=${q}&low-price=${band.min}&high-price=${band.max}`,
+      // nodl=1 is Amazon's own app-link exclusion rule. Without it Android
+      // hands the URL to the Amazon app, which keeps the search text and
+      // silently drops low-price/high-price — so every band looked identical.
+      url: `https://www.amazon.in/s?k=${q}&low-price=${band.min}&high-price=${band.max}&nodl=1`,
     },
     // Ajio has no continuous price param — only fixed buckets, OR-ed by
     // repeating the key. Verified against its own facet JSON.
@@ -210,10 +213,33 @@ export function shopLinks(description: string, bandId: PriceBandId): ShopLink[] 
 }
 
 /** A dead link should do nothing, never take the screen down with it. */
+/**
+ * Opens in an in-app browser rather than handing off to the retailer's app.
+ *
+ * Android App Links mean Myntra, Amazon and Ajio all claim their own https
+ * URLs, and their apps parse the search term but discard the price filter —
+ * which made every price band return the same results. A Custom Tab keeps the
+ * full URL intact, and it keeps the user inside our app.
+ *
+ * Falls back to Linking when the browser module is unavailable, so this still
+ * works on a build that predates it.
+ */
 export async function openShopLink(url: string): Promise<void> {
+  try {
+    const browser = await import('expo-web-browser');
+    await browser.openBrowserAsync(url, {
+      presentationStyle: browser.WebBrowserPresentationStyle.FULL_SCREEN,
+      toolbarColor: '#EFEFEC',
+      controlsColor: '#0E0E0E',
+    });
+    return;
+  } catch {
+    // Module missing or failed to open — fall through to the OS handler.
+  }
+
   try {
     await Linking.openURL(url);
   } catch {
-    // No browser or no handler — nothing useful to say, so stay silent.
+    // No handler at all — nothing useful to say, so stay silent.
   }
 }

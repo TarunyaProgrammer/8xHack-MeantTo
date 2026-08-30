@@ -138,7 +138,7 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
                       position: 'absolute',
                       width: frameWidth,
                       height: frameWidth * 1.5,
-                      borderRadius: radius.tile,
+                      borderRadius: radius.thumb,
                       opacity: 0.18,
                     }}
                   />

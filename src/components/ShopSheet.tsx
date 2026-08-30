@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     paddingHorizontal: space.sm,
-    borderRadius: radius.tile,
+    borderRadius: radius.thumb,
   },
   divider: { borderTopWidth: 1, borderTopColor: color.border },
 });

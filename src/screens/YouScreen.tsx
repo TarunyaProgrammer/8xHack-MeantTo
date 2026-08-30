@@ -88,7 +88,7 @@ export function YouScreen({ looks, onBack }: Props) {
                       style={{
                         width: 54,
                         height: 54,
-                        borderRadius: radius.tile,
+                        borderRadius: radius.thumb,
                         backgroundColor: c.hex,
                         borderWidth: 1,
                         borderColor: color.border,

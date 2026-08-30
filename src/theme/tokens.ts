@@ -46,7 +46,14 @@ export const radius = {
   card: 26,
   button: 999,
   chip: 999,
+  /** Large surfaces — hero frames, the try-on image. */
   tile: 22,
+  /**
+   * Small image tiles. Radius has to scale with the element: 22 on a 104pt
+   * thumbnail eats the corners and looks bloated, while the same value reads
+   * as considered on a full-width card.
+   */
+  thumb: 12,
 } as const;
 
 export const space = {

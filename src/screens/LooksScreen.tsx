@@ -50,7 +50,7 @@ export function LooksScreen({ looks, onOpen, onStart, onBack }: Props) {
                     style={{
                       width: tile,
                       height: tile * 1.4,
-                      borderRadius: radius.tile,
+                      borderRadius: radius.thumb,
                       backgroundColor: color.surfaceHi,
                     }}
                   />

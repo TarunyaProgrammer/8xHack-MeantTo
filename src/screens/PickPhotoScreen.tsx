@@ -49,7 +49,7 @@ export function PickPhotoScreen({ onPick, onCamera, onLooks, onYou }: Props) {
               {
                 width: 104,
                 height: 148,
-                borderRadius: radius.button,
+                borderRadius: radius.thumb,
                 borderWidth: 1,
                 borderColor: color.border,
                 backgroundColor: color.surface,
@@ -73,7 +73,7 @@ export function PickPhotoScreen({ onPick, onCamera, onLooks, onYou }: Props) {
                   style={{
                     width: 104,
                     height: 148,
-                    borderRadius: radius.button,
+                    borderRadius: radius.thumb,
                     borderWidth: active ? 3 : 1,
                     borderColor: active ? color.accent : color.border,
                   }}

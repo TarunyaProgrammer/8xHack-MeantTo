@@ -1,5 +1,6 @@
 export { Card } from './Card';
 export { Chip } from './Chip';
+export { CountUp } from './CountUp';
 export { GhostButton } from './GhostButton';
 export { Icon } from './Icon';
 export type { IconName } from './Icon';

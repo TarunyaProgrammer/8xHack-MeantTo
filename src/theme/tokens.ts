@@ -33,11 +33,16 @@ export const color = {
   borderHi: '#CFC3AE',
 } as const;
 
+/**
+ * Deliberately sharp. Heavy rounding on every surface is what makes an
+ * interface read as a generic template; editorial layouts are built on crisp
+ * corners. Only chips stay fully round, because a pill is a shape with meaning.
+ */
 export const radius = {
-  card: 26,
-  button: 999,
+  card: 10,
+  button: 12,
   chip: 999,
-  tile: 18,
+  tile: 8,
 } as const;
 
 export const space = {

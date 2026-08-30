@@ -1,3 +1,4 @@
+export { AuraBackground } from './AuraBackground';
 export { Card } from './Card';
 export { Chip } from './Chip';
 export { CountUp } from './CountUp';

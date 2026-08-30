@@ -113,6 +113,12 @@ export interface ExtractResult {
   failed: number;
   /** First real error, kept so a total failure can be reported honestly. */
   firstError: string | null;
+  /**
+   * Assets whose extraction threw. These must never be written to the cache —
+   * a cached failure looks identical to a real `junk` result and permanently
+   * suppresses the retry.
+   */
+  failedIds: string[];
 }
 
 /**
@@ -135,6 +141,7 @@ export async function extractAll(
   const results: Item[] = [];
   let failed = 0;
   let firstError: string | null = null;
+  const failedIds: string[] = [];
 
   const workers = Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
     while (queue.length) {
@@ -148,6 +155,7 @@ export async function extractAll(
         // reason is recorded: if everything fails, that is an error to report,
         // not a folder full of memes.
         failed += 1;
+        failedIds.push(shot.assetId);
         const message = err instanceof Error ? err.message : String(err);
         if (!firstError) firstError = message;
         console.log('[extract] failed', shot.assetId, message.slice(0, 200));
@@ -179,5 +187,5 @@ export async function extractAll(
     return acc;
   }, {});
   console.log('[extract] done', items.length, 'items,', failed, 'failed', breakdown);
-  return { items, failed, firstError };
+  return { items, failed, firstError, failedIds };
 }

@@ -1,7 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Item, Session } from '../types';
 
-const K_ITEMS = 'meantto.items.v1';
+// v2: v1 could contain junk entries written by failed extractions, which then
+// suppressed every retry. Bumping the key discards those.
+const K_ITEMS = 'meantto.items.v2';
 const K_SESSION = 'meantto.session.v1';
 const K_VAULT = 'meantto.vault.v1';
 

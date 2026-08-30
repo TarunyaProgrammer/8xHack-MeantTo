@@ -27,7 +27,7 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
         Head to feet. Plain wall.
       </Text>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space.md }}>
         <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.xs }}>
           <Pressable
             accessibilityRole="button"
@@ -80,7 +80,7 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
         label="Style me"
         disabled={!selected}
         onPress={() => selected && onPick(selected)}
-        style={{ marginTop: space.md }}
+        style={{ marginTop: space.md, marginBottom: 78 }}
       />
     </Screen>
   );

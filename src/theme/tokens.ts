@@ -1,34 +1,36 @@
 /**
- * Design tokens — bold, high-contrast, editorial.
+ * Design tokens — warm, light, editorial.
  *
- * Near-black canvas is a functional choice as much as an aesthetic one: this
- * app's whole job is showing colour, and swatches read far more accurately
- * against black than against white. White-on-near-black is also the highest
- * contrast text pairing available, which keeps a loud UI readable.
+ * The background is bone rather than pure white. Pure #FFF plus grey text is
+ * the single most generic combination in mobile design; a warm paper tone with
+ * near-black ink reads as considered and costs nothing in contrast.
  */
 
 export const color = {
-  bg: '#0A0A0F',
-  /** Raised panels. Deliberately close to bg — separation comes from the hairline. */
-  surface: '#15151F',
-  surfaceHi: '#1E1E2B',
+  /** Warm bone. The canvas. */
+  bg: '#F7F2EA',
+  /** Cards lift off the canvas by being cleaner and brighter than it. */
+  surface: '#FFFFFF',
+  /** Recessed wells, inactive segments. */
+  surfaceHi: '#EDE5D8',
 
-  ink: '#FFFFFF',
-  muted: '#8E8EA3',
-  faint: '#5A5A6E',
+  /** Warm near-black. Never pure #000 — it reads harsh on paper tones. */
+  ink: '#17140F',
+  muted: '#7A7167',
+  faint: '#A79C8E',
 
-  /** Acid lime. Primary action, live values, anything the eye should hit first. */
-  accent: '#CCFF00',
-  /** Hot magenta. Energy and emphasis only — never load-bearing for meaning. */
-  hot: '#FF2D9B',
-  /** Electric violet. Third voice for gradients and highlights. */
-  violet: '#7C5CFF',
+  /** Electric cobalt. Primary action. Sings against bone. */
+  accent: '#2340FF',
+  /** Vivid coral. Emphasis and energy, never load-bearing for meaning. */
+  hot: '#FF4A26',
+  /** Violet, third voice. */
+  violet: '#6B4EFF',
 
-  success: '#3DFFA8',
-  danger: '#FF4D5E',
+  success: '#0E9F6E',
+  danger: '#D92D20',
 
-  border: '#26263A',
-  borderHi: '#3A3A55',
+  border: '#E2D9C9',
+  borderHi: '#CFC3AE',
 } as const;
 
 export const radius = {
@@ -47,21 +49,21 @@ export const space = {
   xxl: 48,
 } as const;
 
-/** Glow rather than drop shadow — a dark canvas swallows conventional elevation. */
+/** Soft and warm-tinted. A neutral grey shadow on a warm ground looks dirty. */
 export const shadow = {
   card: {
-    shadowColor: '#000000',
-    shadowOpacity: 0.5,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 10 },
-    elevation: 6,
+    shadowColor: '#4A3F2E',
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3,
   },
   glow: {
     shadowColor: color.accent,
-    shadowOpacity: 0.35,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 8,
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
 } as const;
 

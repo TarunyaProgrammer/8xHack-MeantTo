@@ -1,6 +1,6 @@
 import React from 'react';
-import { ActivityIndicator, Image, ScrollView, Text, View } from 'react-native';
-import { Chip, Card, GhostButton, Screen } from '../components';
+import { Image, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import { Card, Chip, GhostButton, Reveal, Screen, Shimmer } from '../components';
 import { WhereToBuy } from '../components/WhereToBuy';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
@@ -66,6 +66,9 @@ function Swatches({ items }: { items: { hex: string; name: string }[] }) {
 }
 
 export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRestart }: Props) {
+  const { width } = useWindowDimensions();
+  // Screen gutters (24 x2) plus the card's own padding (12 x2).
+  const frameWidth = width - space.lg * 2 - space.sm * 2;
   // Shopping state is local to this screen so App.tsx stays untouched.
   const [band, setBand] = React.useState<PriceBandId>(DEFAULT_BAND);
 
@@ -89,7 +92,7 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: 110 }}>
         <View>
           <Text style={type.caption}>Your season</Text>
           <Text style={[type.mega, { marginTop: 6 }]}>{analysis.season.toUpperCase()}</Text>
@@ -108,19 +111,40 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
               resizeMode="cover"
             />
           ) : (
-            <View style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: radius.button, backgroundColor: color.surface, alignItems: 'center', justifyContent: 'center' }}>
+            <View>
               {tryOnError ? (
-                <Text style={[type.bodyMuted, { textAlign: 'center', paddingHorizontal: space.lg }]}>
-                  {tryOnError}
-                </Text>
+                <View
+                  style={{
+                    width: '100%',
+                    aspectRatio: 2 / 3,
+                    borderRadius: radius.tile,
+                    backgroundColor: color.surfaceHi,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text
+                    style={[type.bodyMuted, { textAlign: 'center', paddingHorizontal: space.lg }]}
+                  >
+                    {tryOnError}
+                  </Text>
+                </View>
               ) : (
                 <>
-                  <ActivityIndicator color={color.accent} />
-                  <Text style={[type.caption, { marginTop: space.sm }]}>Dressing you</Text>
+                  <Shimmer width={frameWidth} height={frameWidth * 1.5} />
                   <Image
                     source={{ uri: original }}
-                    style={{ position: 'absolute', width: '100%', height: '100%', borderRadius: radius.button, opacity: 0.12 }}
+                    style={{
+                      position: 'absolute',
+                      width: frameWidth,
+                      height: frameWidth * 1.5,
+                      borderRadius: radius.tile,
+                      opacity: 0.18,
+                    }}
                   />
+                  <View style={{ position: 'absolute', bottom: space.md, left: 0, right: 0, alignItems: 'center' }}>
+                    <Chip label="Dressing you" tone="accent" />
+                  </View>
                 </>
               )}
             </View>

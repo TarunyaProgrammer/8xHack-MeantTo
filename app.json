@@ -5,7 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.meantto.app",
@@ -87,9 +87,9 @@
     },
     "owner": "rakshit1256",
     "androidStatusBar": {
-      "barStyle": "light-content",
-      "backgroundColor": "#0A0A0F"
+      "barStyle": "dark-content",
+      "backgroundColor": "#F7F2EA"
     },
-    "backgroundColor": "#0A0A0F"
+    "backgroundColor": "#F7F2EA"
   }
 }

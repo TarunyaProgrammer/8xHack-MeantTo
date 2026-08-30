@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: space.xs },
   chip: {
     flex: 1,
-    backgroundColor: color.surface,
+    backgroundColor: color.surfaceHi,
     borderRadius: radius.chip,
     paddingVertical: 9,
     alignItems: 'center',
@@ -54,5 +54,5 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: color.accent },
   pressed: { opacity: 0.6 },
   label: { fontSize: 13, fontWeight: '500', color: color.muted },
-  labelActive: { color: color.bg },
+  labelActive: { color: color.surface },
 });

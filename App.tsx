@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -10,8 +10,8 @@ import { StyleResultScreen } from './src/screens/StyleResultScreen';
 import { MessageScreen } from './src/screens/MessageScreen';
 import { LooksScreen } from './src/screens/LooksScreen';
 import { YouScreen } from './src/screens/YouScreen';
-import { Look, loadLooks, purgeLegacyLooks, saveLook, updateLookTryOn } from './src/lib/looks';
-import { saveTryOnImage } from './src/lib/files';
+import { Look, loadLooks, purgeLegacyLooks, saveLook, setLookTryOn } from './src/lib/looks';
+import { findTryOnImage, saveTryOnImage } from './src/lib/files';
 import { PermissionState, getPhotoPermission, requestPhotoPermission } from './src/lib/screenshots';
 import { Analysis, analysePhoto, generateTryOn } from './src/lib/style';
 
@@ -28,6 +28,13 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<'flow' | 'looks' | 'you'>('flow');
   const [looks, setLooks] = useState<Look[]>([]);
+  /**
+   * The look currently on screen. A render takes up to 45s, so one started
+   * before the user opened a different look can still be in flight — and its
+   * slot index means nothing there. Renders check this before touching state.
+   * They still write to storage, because the image is valid for its own look.
+   */
+  const shown = useRef<string | null>(null);
 
   useEffect(() => {
     void purgeLegacyLooks().then(loadLooks).then(setLooks);
@@ -51,6 +58,7 @@ export default function App() {
   }, [permission]);
 
   const restart = useCallback(() => {
+    shown.current = null;
     setPhoto(null);
     setAnalysis(null);
     setSelectedLook(null);
@@ -59,15 +67,92 @@ export default function App() {
     setStage('pick');
   }, []);
 
-  const openLook = useCallback((look: Look) => {
+  /**
+   * Render one outfit, write it to disk, show it, and record its uri against
+   * the look. Shared so a reopened look fills its gaps by exactly the same
+   * route a fresh analysis does.
+   *
+   * `ready` gates the storage write on the look's row existing: on a fresh
+   * analysis a render can land before `saveLook` has returned, and patching a
+   * row that is not there yet would drop the image.
+   */
+  const renderTryOn = useCallback(
+    async (
+      id: string,
+      photoUri: string,
+      outfit: Analysis['outfits'][number],
+      index: number,
+      ready?: Promise<unknown>
+    ) => {
+      try {
+        const base64 = await generateTryOn(photoUri, outfit);
+        // Straight to disk: a base64 PNG is megabytes, and AsyncStorage on
+        // Android cannot read a row that size back out.
+        const image = await saveTryOnImage(id, index, base64);
+        if (shown.current === id) {
+          setTryOns((prev) => {
+            const next = [...prev];
+            next[index] = image;
+            return next;
+          });
+        }
+        if (ready) await ready;
+        setLooks(await setLookTryOn(id, index, image));
+      } catch (err) {
+        if (shown.current !== id) return;
+        setTryOnErrors((prev) => {
+          const next = [...prev];
+          next[index] = err instanceof Error ? err.message : 'Try-on failed';
+          return next;
+        });
+      }
+    },
+    []
+  );
+
+  /**
+   * Reopen a saved look. The record now carries one image per outfit, so this
+   * is a restore, not a re-render.
+   *
+   * Three tiers, cheapest first:
+   *  1. uris on the record — instant
+   *  2. uris recovered from disk. Looks saved before the record held an array
+   *     recorded only the first image, but all six files were always written
+   *     under a deterministic name, so they can be found and re-attached.
+   *  3. only what is still genuinely missing is generated — a slot that failed
+   *     the first time, which would otherwise shimmer forever.
+   */
+  const openLook = useCallback(async (look: Look) => {
+    const count = look.analysis.outfits.length;
+    shown.current = look.id;
     setPhoto(look.photo);
     setAnalysis(look.analysis);
     setSelectedLook(null);
-    setTryOns(look.tryOn ? [look.tryOn] : []);
-    setTryOnErrors([]);
+    setTryOnErrors(new Array(count).fill(null));
     setPage('flow');
     setStage('result');
-  }, []);
+
+    const slots: (string | null)[] = [];
+    for (let i = 0; i < count; i++) slots.push(look.tryOns[i] ?? null);
+    setTryOns([...slots]);
+
+    // Tier 2. Runs for every gap, but only ever reads the filesystem.
+    const recovered = await Promise.all(
+      slots.map((uri, i) => (uri ? Promise.resolve(uri) : findTryOnImage(look.id, i)))
+    );
+    if (recovered.some((uri, i) => uri && !slots[i])) {
+      if (shown.current === look.id) setTryOns([...recovered]);
+      for (let i = 0; i < count; i++) {
+        if (recovered[i] && !slots[i]) setLooks(await setLookTryOn(look.id, i, recovered[i] as string));
+      }
+    }
+
+    // Tier 3.
+    recovered.forEach((uri, i) => {
+      if (uri) return;
+      void renderTryOn(look.id, look.photo, look.analysis.outfits[i], i);
+    });
+  }, [renderTryOn]);
 
   const onPick = useCallback(async (uri: string) => {
     setPhoto(uri);
@@ -91,44 +176,27 @@ export default function App() {
     // Everything past this point is persistence and the try-on. Neither is
     // allowed to fail the analysis the user is already looking at.
     const id = `${Date.now()}`;
-    const look: Look = { id, savedAt: Date.now(), photo: uri, tryOn: null, analysis: result };
-    const persist = saveLook(look)
-      .then(loadLooks)
-      .then(setLooks)
-      .catch(() => {});
+    const look: Look = {
+      id,
+      savedAt: Date.now(),
+      photo: uri,
+      tryOn: null,
+      tryOns: new Array(result.outfits.length).fill(null),
+      analysis: result,
+    };
+    shown.current = id;
+    const persist = saveLook(look).then(setLooks).catch(() => {});
 
     // Six renders in parallel, each landing in its own slot so the grid fills
-    // in as they arrive rather than waiting on the slowest.
+    // in as they arrive rather than waiting on the slowest. Every slot is
+    // recorded, so reopening this look later costs nothing.
     setTryOns(new Array(result.outfits.length).fill(null));
     setTryOnErrors(new Array(result.outfits.length).fill(null));
 
     result.outfits.forEach((outfit, i) => {
-      generateTryOn(uri, outfit)
-        .then(async (base64) => {
-          // Straight to disk: a base64 PNG is megabytes, and AsyncStorage on
-          // Android cannot read a row that size back out.
-          const image = await saveTryOnImage(`${id}-${i}`, base64);
-          setTryOns((prev) => {
-            const next = [...prev];
-            next[i] = image;
-            return next;
-          });
-          // Only the first look becomes the history thumbnail.
-          if (i === 0) {
-            await persist;
-            await updateLookTryOn(id, image);
-            setLooks(await loadLooks());
-          }
-        })
-        .catch((err) => {
-          setTryOnErrors((prev) => {
-            const next = [...prev];
-            next[i] = err instanceof Error ? err.message : 'Try-on failed';
-            return next;
-          });
-        });
+      void renderTryOn(id, uri, outfit, i, persist);
     });
-  }, []);
+  }, [renderTryOn]);
 
   const styleFlow = () => {
     if (stage === 'permission') {
@@ -238,7 +306,6 @@ export default function App() {
     if (page === 'you') return <YouScreen looks={looks} />;
     return styleFlow();
   };
-
 
   return (
     <SafeAreaProvider>

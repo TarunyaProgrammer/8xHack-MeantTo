@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, Text, View } from 'react-native';
-import { Icon, PrimaryButton, Screen } from '../components';
+import { Chip, Icon, PrimaryButton, Screen } from '../components';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Photo, listRecentPhotos } from '../lib/photos';
 
 interface Props {
   onPick: (uri: string) => void;
+  onLooks: () => void;
+  onYou: () => void;
   onCamera: () => void;
 }
 
 /** Only real photos from the device. An empty roll renders as empty. */
-export function PickPhotoScreen({ onPick, onCamera }: Props) {
+export function PickPhotoScreen({ onPick, onCamera, onLooks, onYou }: Props) {
   const [photos, setPhotos] = useState<Photo[] | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -20,8 +22,18 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
   }, []);
 
   return (
-    <Screen tabSafe>
-      <Text style={type.caption}>Step one</Text>
+    <Screen>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Text style={type.caption}>Step one</Text>
+        <View style={{ flexDirection: 'row', gap: space.xs }}>
+          <Pressable onPress={onLooks} hitSlop={8}>
+            <Chip label="Looks" />
+          </Pressable>
+          <Pressable onPress={onYou} hitSlop={8}>
+            <Chip label="You" />
+          </Pressable>
+        </View>
+      </View>
       <Text style={[type.display, { marginTop: 6 }]}>Pick a photo</Text>
       <Text style={[type.bodyMuted, { marginTop: space.sm, marginBottom: space.lg }]}>
         Head to feet. Plain wall.

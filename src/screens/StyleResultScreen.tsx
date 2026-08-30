@@ -1,7 +1,6 @@
 import React from 'react';
 import { Image, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { Card, Chip, GhostButton, Reveal, Screen, Shimmer } from '../components';
-import { TAB_CLEARANCE } from '../components/TabBar';
 import { WhereToBuy } from '../components/WhereToBuy';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
@@ -93,7 +92,7 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: TAB_CLEARANCE }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: space.lg }}>
         <View>
           <Text style={type.caption}>Your season</Text>
           <Text style={[type.mega, { marginTop: 6 }]}>{analysis.season}</Text>

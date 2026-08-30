@@ -1,12 +1,12 @@
 import React from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Card, Chip, Reveal, Screen } from '../components';
-import { TAB_CLEARANCE } from '../components/TabBar';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Look } from '../lib/looks';
 
 interface Props {
+  onBack: () => void;
   looks: Look[];
 }
 
@@ -23,7 +23,7 @@ function Stat({ value, label }: { value: string | number; label: string }) {
  * Everything here is derived from real saved looks. With no history the screen
  * says so rather than inventing a profile.
  */
-export function YouScreen({ looks }: Props) {
+export function YouScreen({ looks, onBack }: Props) {
   const latest = looks[0];
 
   const seasonCounts = looks.reduce<Record<string, number>>((acc, l) => {
@@ -34,9 +34,14 @@ export function YouScreen({ looks }: Props) {
 
   return (
     <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: TAB_CLEARANCE }}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: space.lg }}>
         <View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Text style={type.caption}>Profile</Text>
+          <Pressable onPress={onBack} hitSlop={10}>
+            <Chip label="Back" />
+          </Pressable>
+        </View>
           <Text style={[type.display, { marginTop: 6 }]}>You</Text>
         </View>
 

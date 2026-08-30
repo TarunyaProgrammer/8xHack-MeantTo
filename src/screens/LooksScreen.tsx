@@ -1,7 +1,6 @@
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { Card, Chip, Reveal, Screen } from '../components';
-import { TAB_CLEARANCE } from '../components/TabBar';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Look } from '../lib/looks';
@@ -10,16 +9,22 @@ interface Props {
   looks: Look[];
   onOpen: (look: Look) => void;
   onStart: () => void;
+  onBack: () => void;
 }
 
 /** Only real saved looks. An empty history renders as empty. */
-export function LooksScreen({ looks, onOpen, onStart }: Props) {
+export function LooksScreen({ looks, onOpen, onStart, onBack }: Props) {
   const { width } = useWindowDimensions();
   const tile = (width - space.lg * 2 - space.sm) / 2;
 
   return (
     <Screen>
-      <Text style={type.caption}>Your history</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={type.caption}>Your history</Text>
+          <Pressable onPress={onBack} hitSlop={10}>
+            <Chip label="Back" />
+          </Pressable>
+        </View>
       <Text style={[type.display, { marginTop: 6, marginBottom: space.lg }]}>Your looks</Text>
 
       {looks.length === 0 ? (
@@ -33,7 +38,7 @@ export function LooksScreen({ looks, onOpen, onStart }: Props) {
           </Pressable>
         </Card>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: TAB_CLEARANCE }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space.lg }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {looks.map((look, i) => (
               <Reveal key={look.id} index={i}>

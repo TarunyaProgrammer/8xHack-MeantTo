@@ -9,7 +9,6 @@ import { StyleResultScreen } from './src/screens/StyleResultScreen';
 import { MessageScreen } from './src/screens/MessageScreen';
 import { LooksScreen } from './src/screens/LooksScreen';
 import { YouScreen } from './src/screens/YouScreen';
-import { TabBar, TabId } from './src/components/TabBar';
 import { Look, loadLooks, purgeLegacyLooks, saveLook, updateLookTryOn } from './src/lib/looks';
 import { saveTryOnImage } from './src/lib/files';
 import { PermissionState, getPhotoPermission, requestPhotoPermission } from './src/lib/screenshots';
@@ -25,7 +24,7 @@ export default function App() {
   const [tryOn, setTryOn] = useState<string | null>(null);
   const [tryOnError, setTryOnError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [tab, setTab] = useState<TabId>('style');
+  const [page, setPage] = useState<'flow' | 'looks' | 'you'>('flow');
   const [looks, setLooks] = useState<Look[]>([]);
 
   useEffect(() => {
@@ -62,7 +61,7 @@ export default function App() {
     setAnalysis(look.analysis);
     setTryOn(look.tryOn);
     setTryOnError(null);
-    setTab('style');
+    setPage('flow');
     setStage('result');
   }, []);
 
@@ -119,7 +118,14 @@ export default function App() {
       );
     }
     if (stage === 'pick') {
-      return <PickPhotoScreen onPick={onPick} onCamera={() => setStage('camera')} />;
+      return (
+        <PickPhotoScreen
+          onPick={onPick}
+          onCamera={() => setStage('camera')}
+          onLooks={() => setPage('looks')}
+          onYou={() => setPage('you')}
+        />
+      );
     }
     if (stage === 'camera') {
       return <CameraScreen onCapture={onPick} onClose={() => setStage('pick')} />;
@@ -153,31 +159,28 @@ export default function App() {
   };
 
   const body = () => {
-    if (tab === 'looks') {
+    if (page === 'looks') {
       return (
         <LooksScreen
           looks={looks}
           onOpen={openLook}
+          onBack={() => setPage('flow')}
           onStart={() => {
-            setTab('style');
+            setPage('flow');
             setStage('pick');
           }}
         />
       );
     }
-    if (tab === 'you') return <YouScreen looks={looks} />;
+    if (page === 'you') return <YouScreen looks={looks} onBack={() => setPage('flow')} />;
     return styleFlow();
   };
 
-  // The tab bar floats over content, so it hides during full-bleed capture and
-  // while a step is mid-flight — a nav control you cannot act on is noise.
-  const showTabs = tab !== 'style' || stage === 'permission' || stage === 'pick' || stage === 'result';
 
   return (
     <SafeAreaProvider>
       <StatusBar style="dark" />
       {body()}
-      {showTabs && <TabBar active={tab} onChange={setTab} />}
     </SafeAreaProvider>
   );
 }

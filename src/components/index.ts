@@ -11,5 +11,3 @@ export { Shimmer } from './Shimmer';
 export { Screen } from './Screen';
 export { StatRow } from './StatRow';
 export { ShopSheet } from './ShopSheet';
-export { TabBar, TAB_CLEARANCE } from './TabBar';
-export type { TabId } from './TabBar';

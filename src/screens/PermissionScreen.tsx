@@ -8,9 +8,11 @@ import { PermissionState } from '../lib/screenshots';
 interface Props {
   permission: PermissionState;
   onScan: () => void;
+  /** Camera works without library access, so denial must not be a dead end. */
+  onCamera: () => void;
 }
 
-export function PermissionScreen({ permission, onScan }: Props) {
+export function PermissionScreen({ permission, onScan, onCamera }: Props) {
   const blocked = permission === 'denied';
 
   return (
@@ -25,9 +27,14 @@ export function PermissionScreen({ permission, onScan }: Props) {
       {blocked ? (
         <>
           <Text style={[type.body, { color: color.muted, marginBottom: space.md }]}>
-            Photo access is off. Turn it on to pick a photo.
+            Photo access is off.
           </Text>
-          <GhostButton label="Open Settings" onPress={() => Linking.openSettings()} />
+          <PrimaryButton label="Take a photo instead" onPress={onCamera} />
+          <GhostButton
+            label="Open Settings"
+            onPress={() => Linking.openSettings()}
+            style={{ marginTop: space.sm }}
+          />
         </>
       ) : (
         <PrimaryButton label="Get started" onPress={onScan} />

@@ -302,53 +302,133 @@ fuller piece. Name the resulting shape:
 Decide the silhouette FIRST, then choose garments that produce it.
 
 FABRIC AND DRAPE
-Structure holds a shape away from the body: worsted wool, flannel, tweed,
-denim, corduroy, canvas, ponte, leather, boiled wool. Use it to build shoulders,
-straight lines and a clean edge. Heavy structured fabric adds visual volume, so
-put it where you want volume and nowhere else.
-Fluid fabric follows the body: silk crepe, viscose, tencel, cupro, fine jersey,
-washed linen, brushed cotton. Use it where you want the line to fall rather
-than stand.
-Matte surfaces recede — flannel, brushed cotton, suede, matte wool. Lustrous
-surfaces advance — satin, silk, patent, sequin, tight worsted. Put lustre where
-you want the eye and matte everywhere else.
-Weight follows the palette's season: linen, seersucker, poplin, cotton and open
-knits for light and warm-bright palettes; flannel, corduroy, tweed, moleskin,
-merino and boiled wool for deep and muted ones.
+Score every cloth on four axes: does it hold a shape or fall onto the body,
+does it add bulk, is it matte or lustrous, and where does it sit on formality.
+
+Structured cloth stands away from the body and keeps the shape it was cut into.
+It is how you build a shoulder, a straight leg or a defined waist that stays
+defined. It also adds real visual volume, because the perceived edge of the body
+becomes the edge of the fabric. Use it where you want volume and nowhere else.
+  tweed (the most architectural, and the bulkiest), boiled wool, boucle,
+  heavy flannel 12-16oz, rigid denim 14oz and up, canvas, moleskin, wide-wale
+  corduroy, ponte, scuba, grain leather, wool gabardine, heavy linen 300gsm+
+Fluid cloth follows the body and skims rather than describes. Use it where you
+want the line to fall.
+  silk crepe and crepe de chine (the most forgiving fluid cloth — it moves
+  without clinging), viscose, tencel, cupro, fine-gauge merino and cashmere,
+  washed midweight linen 160-260gsm, fine jersey, charmeuse
+Note the two failure modes. Stiff cloth in a flowing cut just looks bulky.
+Fluid cloth in a cut that needed structure collapses and reads shapeless or
+clinging. Match the cloth to the shape you named.
+
+Matte surfaces recede and hide contour — flannel, moleskin, brushed cotton,
+suede, tweed, wool crepe. Lustrous surfaces advance and magnify whatever is
+under them — satin, charmeuse, patent, velvet, high-Super worsted. Put lustre
+in one place, matte everywhere else.
+
+Weight follows the palette. Light, bright and warm palettes carry linen,
+seersucker, poplin, voile, tropical wool and open knits. Deep and muted
+palettes carry flannel, corduroy, tweed, moleskin, merino, boucle, velvet and
+brushed wool, because deep saturated colour needs a light-absorbing surface to
+read rich rather than plastic. A pale colour in a heavy napped cloth, or a
+chocolate poplin in July, reads as a mistake.
+
+Match the visual mass of the shoe to the mass of the cloth above it. A lug-sole
+boot under fine tropical wool is unbalanced; a slim leather-soled loafer under
+14oz tweed trousers is equally wrong.
 
 TEXTURE INSTEAD OF PATTERN
-In a tonal or low-contrast look, texture is what stops it going flat. Mix at
-least two surfaces: ribbed against smooth, brushed against crisp, cable against
-flat-woven, suede against wool, slub linen against poplin. This is the single
-move that most reliably separates a considered outfit from a default one.
+Texture makes depth out of one colour: highlight and shadow with no second
+colour to clash. It is the load-bearing device in tonal dressing — without it a
+one-colour outfit reads as a flat silhouette.
+Assign three different surfaces to three different areas: the largest outer
+piece gets the most texture (tweed, boucle, brushed wool, cord), the middle
+layer gets medium texture (ribbed knit, cable, flannel, suede), the base gets
+the smoothest finish (poplin, silk crepe, fine merino). Two matte cottons look
+like whatever was clean; matte cotton against suede against brushed wool reads
+as a decision.
+Texture also solves pattern clash: a striped shirt fights a striped jacket, but
+the same shirt against a solid herringbone works, because texture and pattern
+occupy different channels.
+Limits: two strongly textured pieces maximum. More texture always means more
+casual, so texture-mixing belongs at casual and smart casual; at smart and
+formal the texture has to shrink to near-invisible — nailhead, sharkskin, a
+faint herringbone.
 
 FORMALITY
-Every garment in the look must sit on the same rung, or one rung apart at most.
-  casual — jersey, sweatshirt, washed denim, canvas or rubber-soled shoes
-  smart casual — knitwear, chinos, overshirt, raw denim, suede loafers, boots
-  business casual — unstructured blazer, wool trousers, oxford shirt, derby
-  smart — worsted suiting, fine knit, silk, leather-soled oxfords
-  formal — dinner jacket, silk facing, patent or highly polished leather
-Leather dresses up, suede dresses down. A leather sole dresses up, a rubber
-lug sole dresses down. A crisp poplin dresses up, a slub oxford dresses down.
-A structured shoulder dresses up, a patch pocket dresses down.
-Mixing rungs by more than one is the fastest way to make an outfit read as
-unconsidered — a suit jacket over a jersey t-shirt and running shoes is the
-classic failure.
+Formality rises with smoothness, lustre, darkness, plainness, structure, and a
+business rather than sport, country, military or workwear origin.
+  casual — jersey, sweatshirt, henley, mid or light-wash denim, wide-wale cord,
+    chore coat, field jacket, technical shell; sneakers, canvas, work boots,
+    rubber and lug soles
+  smart casual — fine-gauge merino or cashmere knit, knitted polo, oxford
+    button-down, chambray, overshirt, unstructured sport coat, chinos, cords,
+    dark-rinse or raw denim, midweight linen; suede loafers, chukkas, Chelsea
+    boots, dress boots
+  business casual — solid blazer or structured knit jacket, poplin or twill
+    shirt, wool or twill trousers, knee-length skirt, sheath dress; leather
+    derbies, loafers, monks, pumps, block heels
+  smart — matched worsted suiting in navy or charcoal, poplin dress shirt with
+    a spread collar, silk, fine knit; black or dark brown calf oxfords, leather
+    soles
+  formal — dinner jacket with satin or grosgrain facing, marcella shirt,
+    patent leather
+
+Ranked micro-hierarchies, most formal first:
+  fabric: cashmere, worsted, wool, flannel and tweed, cotton, linen
+  jacket pockets: jetted, flap, patch
+  lapels: peak, shawl, notch
+  shirt collars: wing, tab, spread, point, button-down
+  shoes: oxford, monk, derby, loafer; less broguing is more formal
+  soles: leather, slim rubber, crepe, commando lug
+  outerwear: topcoat, trench, pea coat, quilted or bomber, field or denim
+    jacket, technical shell
+Suede is always one rung below the same item in grain leather. A button-down
+collar caps a shirt at business casual whatever the cloth. Once the jacket and
+the trousers are different cloths, the outfit is immediately more casual.
+Denim's formality is set by wash: light and distressed at the bottom, mid in
+the middle, dark rinse capable of smart casual.
+
+Keep every garment on the same rung, or allow exactly ONE deliberate gap and
+keep everything else in agreement. Three garments at three different rungs is
+what makes an outfit read as a mistake rather than a choice — a suit jacket
+over a jersey tee with running shoes is the classic failure.
 
 PATTERN
-Scale the pattern to the person: fine stripe or micro check on a small frame,
-wide stripe, windowpane or large check on a large frame. If two patterns are
-used, the scale of one must be at least double the other, and they must share
-a colour from the palette. Otherwise use a solid and carry the interest in
-texture.
+Pattern scale is read relative to the body. A small repeat on a large frame
+enlarges it; a large repeat on a small frame swallows it.
+  short or small frame: fine stripe, micro check, houndstooth, checks taller
+    than wide, closely spaced verticals
+  tall frame: wider stripes, windowpane, larger checks, rectangles wider than
+    tall; micro-checks read lanky
+  broad frame: thicker stripes rather than pinstripes, larger windowpane rather
+    than tiny check, muted rather than vivid
+  slim frame: horizontal stripe adds width; medium or micro check
+Use a pattern when it is doing the focal-point job, when a large expanse of one
+cloth needs breaking up, or when the look would otherwise read flat. Use a solid
+at high formality, when something else already carries a pattern, or when the
+piece is the ground under a statement.
+If two patterns appear, one must be at least double the scale of the other, one
+must be quiet, and they must share a palette colour.
 
 =====================================================================
 STEP 6 — WHAT MAKES IT READ AS CONSIDERED
 =====================================================================
-- One focal point. One colour, one texture or one shape leads. The rest supports.
-- Repeat one palette colour in two places — a shoe and a knit, a belt and a
-  collar. Repetition looks deliberate; a single stray colour looks accidental.
+- One focal point. Exactly one hero — a colour, a texture, a shape or a shoe.
+  Everything else moves to the quieter option. Two focal points reads chaotic.
+- Repeat one element at two non-adjacent points: the shoe leather picked up in
+  the belt, a colour in the knit repeated in the outer layer. Repetition is the
+  clearest signal of intent, because it cannot happen by accident.
+- Three pieces, not two. Two garments is an outfit; a third layer — an
+  overshirt, a cardigan, a waistcoat, an unstructured jacket — is what makes it
+  a look. Only skip it when the weather in the photo rules it out.
+- Divide the body near thirds, not halves. The waistband is the loudest
+  horizontal line in the outfit; put it where it makes a 1/3 to 2/3 split.
+- Upgrade the material rather than the item: suede instead of canvas, fine
+  merino instead of jersey, a heavier knit that does not cling.
+- One deliberate friction is allowed and is often what separates styling from
+  compliance — a tailored trouser with a matte technical shell, a satin skirt
+  with a chunky knit. One gap held on purpose. Never three.
 - Say the exact colour, the exact fabric and the exact cut. Every garment string
   must contain a colour, a material and a named garment.
 - Vary the formality across runs. Not every look should be a weekend look.

@@ -69,7 +69,15 @@ export default function App() {
   }, []);
 
   const body = () => {
-    if (stage === 'permission') return <PermissionScreen permission={permission} onScan={start} />;
+    if (stage === 'permission') {
+      return (
+        <PermissionScreen
+          permission={permission}
+          onScan={start}
+          onCamera={() => setStage('camera')}
+        />
+      );
+    }
     if (stage === 'pick') {
       return <PickPhotoScreen onPick={onPick} onCamera={() => setStage('camera')} />;
     }
@@ -99,7 +107,9 @@ export default function App() {
         />
       );
     }
-    return <PermissionScreen permission={permission} onScan={start} />;
+    return (
+      <PermissionScreen permission={permission} onScan={start} onCamera={() => setStage('camera')} />
+    );
   };
 
   return (

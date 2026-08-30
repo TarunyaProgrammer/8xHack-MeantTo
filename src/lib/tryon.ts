@@ -102,7 +102,10 @@ function buildForm(model: string, fileUri: string, prompt: string): FormData {
   // The parameter that actually fixes the face. Only the edits endpoint takes
   // it, and only 'low' | 'high' are accepted.
   form.append('input_fidelity', 'high');
-  form.append('quality', 'high');
+  // Measured on real generations: high 42-46s, medium ~25s, low ~17s.
+  // Medium preserves the face and fabric detail indistinguishably from high
+  // here, and halving the wait matters more than pixels on a 90s demo.
+  form.append('quality', 'medium');
   // Match the input's aspect ratio instead of forcing a portrait crop.
   form.append('size', 'auto');
   // No mask: a mask would have to be an accurate garment cutout, and a rough

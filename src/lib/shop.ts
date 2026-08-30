@@ -13,7 +13,7 @@ import * as Linking from 'expo-linking';
  * URL formats — verified against the live sites on 2026-08-30:
  *
  * MYNTRA — verified end to end.
- *   https://www.myntra.com/<slug>?rawQuery=<query>&f=Price_range%3A<min>.0_<max>.0
+ *   https://www.myntra.com/<slug>?rawQuery=<q>&rf=Price%3A<min>.0_<max>.0_<min>.0%20TO%20<max>.0
  *   Fetching this returns HTTP 200 and Myntra's embedded page state echoes
  *   `"appliedParams":{"filters":[{"id":"Price_range","values":["1500.0_4000.0"]}]}`,
  *   and the result set shrinks versus the unfiltered URL — so the filter is
@@ -139,6 +139,28 @@ export interface ShopLink {
   url: string;
 }
 
+
+/**
+ * Ajio exposes price only as fixed buckets. Every bucket overlapping the band
+ * is selected and OR-ed by repeating the facet key.
+ */
+const AJIO_BUCKETS: { label: string; min: number; max: number }[] = [
+  { label: 'Below Rs.500', min: 0, max: 500 },
+  { label: 'Rs.500-1000', min: 500, max: 1000 },
+  { label: 'Rs.1001-1500', min: 1001, max: 1500 },
+  { label: 'Rs.1501-2000', min: 1501, max: 2000 },
+  { label: 'Rs.2001-2500', min: 2001, max: 2500 },
+  { label: 'Rs.2501-5000', min: 2501, max: 5000 },
+  { label: 'Above Rs.5000', min: 5000, max: Number.MAX_SAFE_INTEGER },
+];
+
+function ajioBuckets(band: { min: number; max: number }): string {
+  const hits = AJIO_BUCKETS.filter((b) => b.min <= band.max && b.max >= band.min);
+  if (hits.length === 0) return '';
+  const facets = hits.map((b) => `%3Apricerange%3A${encodeURIComponent(b.label)}`).join('');
+  return `&query=%3Arelevance${facets}&gridColumns=3`;
+}
+
 /** Myntra routes search through a path slug, e.g. /navy-linen-shirt. */
 function slugify(query: string): string {
   return query
@@ -160,22 +182,29 @@ export function shopLinks(description: string, bandId: PriceBandId): ShopLink[] 
   const q = encodeURIComponent(query);
   const slug = slugify(query);
 
-  const myntraPriceFilter = encodeURIComponent(`Price_range:${band.min}.0_${band.max}.0`);
+  // Myntra's range filter is `rf=Price:` with a redundant triple value.
+  // The obvious `f=Price_range:min_max` returns totalCount 0 — an empty results
+  // page that still answers HTTP 200, which is why it looks like it works.
+  // Verified: unfiltered 819 -> rf 1000-2000 = 303, f=Price_range = 0.
+  const myntraPriceFilter = encodeURIComponent(
+    `Price:${band.min}.0_${band.max}.0_${band.min}.0 TO ${band.max}.0`
+  );
   const myntraPath = slug || 'clothing';
 
   return [
     {
       retailer: 'Myntra',
-      url: `https://www.myntra.com/${myntraPath}?rawQuery=${q}&f=${myntraPriceFilter}`,
+      url: `https://www.myntra.com/${myntraPath}?rawQuery=${q}&rf=${myntraPriceFilter}`,
     },
     {
       retailer: 'Amazon',
       url: `https://www.amazon.in/s?k=${q}&low-price=${band.min}&high-price=${band.max}`,
     },
-    // No price filter: Ajio's facet format is unverified (see the header note).
+    // Ajio has no continuous price param — only fixed buckets, OR-ed by
+    // repeating the key. Verified against its own facet JSON.
     {
       retailer: 'Ajio',
-      url: `https://www.ajio.com/search/?text=${q}`,
+      url: `https://www.ajio.com/search/?text=${q}${ajioBuckets(band)}`,
     },
   ];
 }

@@ -18,7 +18,9 @@ export function PrimaryButton({ label, onPress, disabled, loading, style }: Prop
       accessibilityRole="button"
       disabled={inactive}
       onPress={() => {
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        // Haptics are cosmetic and unavailable on some devices. A failure here
+        // must never swallow the tap.
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
         onPress();
       }}
       style={({ pressed }) => [

@@ -1,4 +1,4 @@
-import { askText } from './anthropic';
+import { askText } from './ai';
 import { Item, ItemType, TYPE_LABEL, emptyCounts } from '../types';
 
 /** Counts come from the real extracted items. Nothing here is hardcoded. */

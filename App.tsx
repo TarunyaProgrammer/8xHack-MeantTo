@@ -25,9 +25,19 @@ export default function App() {
   }, []);
 
   const startScan = useCallback(async () => {
-    const state = permission === 'granted' ? 'granted' : await requestPhotoPermission();
-    setPermission(state);
-    if (state !== 'granted') return;
+    let state = permission;
+    if (state !== 'granted') {
+      try {
+        state = await requestPhotoPermission();
+      } catch {
+        state = 'denied';
+      }
+      setPermission(state);
+    }
+
+    // Run regardless of the exact permission verdict. Partial access still
+    // returns real screenshots, and anything that genuinely fails surfaces as
+    // a visible error rather than a button that does nothing.
     setStage('verdict');
     await scan.run();
   }, [permission, scan]);

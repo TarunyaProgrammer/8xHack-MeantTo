@@ -1,5 +1,5 @@
-export { LookDeck } from './LookDeck';
-export type { DeckItem } from './LookDeck';
+export { SwipeDeck } from './SwipeDeck';
+export type { DeckItem } from './SwipeDeck';
 export { HeroImage } from './HeroImage';
 export { Card } from './Card';
 export { Chip } from './Chip';

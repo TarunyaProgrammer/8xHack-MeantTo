@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { Card, Chip, GhostButton, LookDeck, Screen, Shimmer } from '../components';
+import { Card, Chip, GhostButton, Screen, Shimmer, SwipeDeck } from '../components';
 import { WhereToBuy } from '../components/WhereToBuy';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
@@ -158,9 +158,8 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, sel
           </View>
         </View>
 
-        <LookDeck
+        <SwipeDeck
           original={original}
-          gutter={space.lg}
           onOpen={onSelect}
           items={analysis.outfits.map((look, i) => ({
             key: look.register,

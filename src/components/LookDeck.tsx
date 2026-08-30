@@ -25,15 +25,21 @@ interface Props {
   items: DeckItem[];
   original: string;
   onOpen: (index: number) => void;
+  /** Horizontal padding the parent screen applies, so the deck can escape it. */
+  gutter: number;
 }
 
 /**
- * Horizontally paged deck of looks.
+ * Horizontally paged deck of looks — exactly one card per frame.
+ *
+ * Each page is the full window width with the card inset inside it, so no
+ * neighbour peeks in at the edges. The deck escapes the screen gutter with a
+ * negative margin; without it the pages would be narrower than the window and
+ * the paging would drift out of alignment.
  *
  * A paged ScrollView rather than a gesture library: snapping is native, the
- * momentum feels right for free, and it adds no module that would force a
- * rebuild. Neighbouring cards scale down slightly so the deck reads as a stack
- * rather than a filmstrip.
+ * momentum feels right for free, and it adds no module that would force
+ * another dev build.
  */
 function Anim({ scroll, index, cardW, children }: {
   scroll: SharedValue<number>;
@@ -52,14 +58,14 @@ function Anim({ scroll, index, cardW, children }: {
   return <Animated.View style={style}>{children}</Animated.View>;
 }
 
-export function LookDeck({ items, original, onOpen }: Props) {
+export function LookDeck({ items, original, onOpen, gutter }: Props) {
   const { width } = useWindowDimensions();
   const [page, setPage] = useState(0);
   const scroll = useSharedValue(0);
 
-  const cardW = width - space.lg * 2;
-  const gap = space.sm;
-  const step = cardW + gap;
+  // One page per screen width; the card sits inset within it.
+  const step = width;
+  const cardW = width - gutter * 2;
 
   const onScroll = useAnimatedScrollHandler({
     onScroll: (e) => {
@@ -71,12 +77,12 @@ export function LookDeck({ items, original, onOpen }: Props) {
     <View>
       <Animated.ScrollView
         horizontal
+        pagingEnabled
         showsHorizontalScrollIndicator={false}
-        snapToInterval={step}
         decelerationRate="fast"
         onScroll={onScroll}
         scrollEventThrottle={16}
-        contentContainerStyle={{ gap }}
+        style={{ marginHorizontal: -gutter }}
         onMomentumScrollEnd={(e) => {
           const next = Math.round(e.nativeEvent.contentOffset.x / step);
           if (next !== page) {
@@ -86,9 +92,10 @@ export function LookDeck({ items, original, onOpen }: Props) {
         }}
       >
         {items.map((item, i) => (
-          <Anim key={item.key} scroll={scroll} index={i} cardW={step}>
-            <Pressable onPress={() => onOpen(i)} disabled={!item.image}>
-              <View style={[styles.card, { width: cardW }]}>
+          <View key={item.key} style={{ width: step, paddingHorizontal: gutter }}>
+            <Anim scroll={scroll} index={i} cardW={step}>
+              <Pressable onPress={() => onOpen(i)} disabled={!item.image}>
+                <View style={[styles.card, { width: cardW }]}>
                 {item.image ? (
                   <Animated.Image
                     entering={FadeIn.duration(450)}
@@ -110,15 +117,16 @@ export function LookDeck({ items, original, onOpen }: Props) {
                   </View>
                 )}
 
-                <View style={styles.meta}>
-                  <Text style={styles.label}>{item.label}</Text>
-                  <Text style={[type.body, { fontWeight: '700', marginTop: 4 }]} numberOfLines={2}>
-                    {item.caption}
-                  </Text>
+                  <View style={styles.meta}>
+                    <Text style={styles.label}>{item.label}</Text>
+                    <Text style={[type.body, { fontWeight: '700', marginTop: 4 }]} numberOfLines={2}>
+                      {item.caption}
+                    </Text>
+                  </View>
                 </View>
-              </View>
-            </Pressable>
-          </Anim>
+              </Pressable>
+            </Anim>
+          </View>
         ))}
       </Animated.ScrollView>
 

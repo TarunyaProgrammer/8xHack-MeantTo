@@ -154,6 +154,7 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onR
 
         <LookDeck
           original={original}
+          gutter={space.lg}
           onOpen={setSelected}
           items={analysis.outfits.map((look, i) => ({
             key: look.register,

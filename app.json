@@ -1,0 +1,65 @@
+{
+  "expo": {
+    "name": "Meant To",
+    "slug": "meant-to",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.meantto.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Meant To reads your Screenshots album to find the things you meant to do.",
+        "NSContactsUsageDescription": "Meant To saves contacts it finds in your screenshots.",
+        "NSCalendarsUsageDescription": "Meant To adds events it finds in your screenshots to your calendar.",
+        "NSCalendarsFullAccessUsageDescription": "Meant To adds events it finds in your screenshots to your calendar."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.meantto.app",
+      "permissions": [
+        "READ_MEDIA_IMAGES",
+        "READ_EXTERNAL_STORAGE",
+        "READ_CONTACTS",
+        "WRITE_CONTACTS",
+        "READ_CALENDAR",
+        "WRITE_CALENDAR"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "meantto",
+    "newArchEnabled": true,
+    "plugins": [
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Meant To reads your Screenshots album.",
+          "savePhotosPermission": "Meant To needs access to your photos.",
+          "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "Meant To saves contacts found in your screenshots."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Meant To adds events found in your screenshots."
+        }
+      ]
+    ]
+  }
+}

@@ -48,7 +48,7 @@ export function useScan() {
       setState((s) => ({ ...s, totalScreenshots: total, progress: { done: 0, total: shots.length } }));
 
       const cached = await loadItems();
-      const { items, failed, firstError } = await extractAll(shots, cached, (progress) =>
+      const { items, failed, firstError, failedIds } = await extractAll(shots, cached, (progress) =>
         setState((s) => ({ ...s, progress }))
       );
 
@@ -63,7 +63,10 @@ export function useScan() {
         return;
       }
 
-      await saveItems(items);
+      // Persist only what actually extracted. Caching a failure would make it
+      // indistinguishable from a real `junk` result and suppress every retry.
+      const failedSet = new Set(failedIds);
+      await saveItems(items.filter((i) => !failedSet.has(i.assetId)));
 
       const counts = computeCounts(items);
       const totalValue = computeTotalValue(items);

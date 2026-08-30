@@ -1,26 +1,23 @@
-import React from 'react';
-import { Image, ScrollView, Text, useWindowDimensions, View } from 'react-native';
+import React, { useState } from 'react';
+import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { Card, Chip, GhostButton, Reveal, Screen, Shimmer } from '../components';
 import { WhereToBuy } from '../components/WhereToBuy';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Analysis } from '../lib/style';
-import {
-  DEFAULT_BAND,
-  PriceBandId,
-  garmentsFrom,
-  loadPriceBand,
-  savePriceBand,
-} from '../lib/shop';
+import { DEFAULT_BAND, PriceBandId, garmentsFrom, loadPriceBand, savePriceBand } from '../lib/shop';
+
+type Look = Analysis['outfits'][number];
 
 interface Props {
   original: string;
   analysis: Analysis;
-  tryOn: string | null;
-  tryOnError: string | null;
+  /** One slot per look, filled as each render lands. */
+  tryOns: (string | null)[];
+  tryOnErrors: (string | null)[];
   onRestart: () => void;
 }
-
 
 /** Garment slots read loosely, so a schema change cannot blank the card. */
 const SLOTS: [label: string, key: string][] = [
@@ -31,11 +28,11 @@ const SLOTS: [label: string, key: string][] = [
   ['Detail', 'accessory'],
 ];
 
-function outfitRows(analysis: Analysis): { label: string; value: string }[] {
-  const outfit = analysis.outfit as Record<string, unknown>;
+function outfitRows(look: Look): { label: string; value: string }[] {
+  const record = look as Record<string, unknown>;
   const rows: { label: string; value: string }[] = [];
   for (const [label, key] of SLOTS) {
-    const value = outfit[key];
+    const value = record[key];
     if (typeof value === 'string' && value.trim() !== '') rows.push({ label, value });
   }
   return rows;
@@ -50,7 +47,7 @@ function Swatches({ items }: { items: { hex: string; name: string }[] }) {
             style={{
               width: 62,
               height: 62,
-              borderRadius: radius.tile,
+              borderRadius: radius.thumb,
               backgroundColor: c.hex,
               borderWidth: 1,
               borderColor: color.borderHi,
@@ -65,30 +62,83 @@ function Swatches({ items }: { items: { hex: string; name: string }[] }) {
   );
 }
 
-export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRestart }: Props) {
+export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onRestart }: Props) {
   const { width } = useWindowDimensions();
-  // Screen gutters (24 x2) plus the card's own padding (12 x2).
-  const frameWidth = width - space.lg * 2 - space.sm * 2;
-  // Shopping state is local to this screen so App.tsx stays untouched.
-  const [band, setBand] = React.useState<PriceBandId>(DEFAULT_BAND);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [band, setBand] = useState<PriceBandId>(DEFAULT_BAND);
 
   React.useEffect(() => {
-    let alive = true;
-    void loadPriceBand().then((saved) => {
-      if (alive) setBand(saved);
-    });
-    return () => {
-      alive = false;
-    };
+    void loadPriceBand().then(setBand);
   }, []);
 
-  const onChangeBand = React.useCallback((next: PriceBandId) => {
-    setBand(next);
-    void savePriceBand(next);
-  }, []);
+  const tile = (width - space.lg * 2 - space.sm) / 2;
+  const ready = tryOns.filter(Boolean).length;
 
-  // The outfit shape may gain fields, so the garment list is derived defensively.
-  const garments = React.useMemo(() => garmentsFrom(analysis.outfit), [analysis.outfit]);
+  if (selected !== null) {
+    const look = analysis.outfits[selected];
+    const image = tryOns[selected];
+
+    return (
+      <Screen>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: space.lg }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={type.caption}>{look.register}</Text>
+            <Pressable onPress={() => setSelected(null)} hitSlop={10}>
+              <Chip label="All looks" />
+            </Pressable>
+          </View>
+
+          <Card style={{ padding: space.sm }}>
+            {image ? (
+              <Animated.Image
+                entering={FadeIn.duration(400)}
+                source={{ uri: image }}
+                style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: radius.tile }}
+                resizeMode="cover"
+              />
+            ) : (
+              <Shimmer width={width - space.lg * 2 - space.sm * 2} height={(width - space.lg * 2 - space.sm * 2) * 1.5} />
+            )}
+          </Card>
+
+          <Card hero>
+            <Text style={type.caption}>The fit</Text>
+            <Text style={[type.h1, { marginTop: 6 }]}>{look.top}</Text>
+            {outfitRows(look).slice(1).map((row, i) => (
+              <View
+                key={row.label}
+                style={{
+                  flexDirection: 'row',
+                  gap: space.md,
+                  paddingVertical: space.sm,
+                  borderTopWidth: 1,
+                  borderTopColor: color.border,
+                  marginTop: i === 0 ? space.sm : 0,
+                }}
+              >
+                <Text style={{ width: 62, fontSize: 10, fontWeight: '800', letterSpacing: 1.2, textTransform: 'uppercase', color: color.faint, paddingTop: 3 }}>
+                  {row.label}
+                </Text>
+                <Text style={[type.body, { flex: 1, fontWeight: '700' }]}>{row.value}</Text>
+              </View>
+            ))}
+            <Text style={[type.bodyMuted, { fontSize: 14, marginTop: space.md, paddingTop: space.md, borderTopWidth: 1, borderTopColor: color.border }]}>
+              {look.why}
+            </Text>
+          </Card>
+
+          <WhereToBuy
+            garments={garmentsFrom(look)}
+            band={band}
+            onChangeBand={(id) => {
+              setBand(id);
+              void savePriceBand(id);
+            }}
+          />
+        </ScrollView>
+      </Screen>
+    );
+  }
 
   return (
     <Screen>
@@ -99,109 +149,43 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
           <View style={{ flexDirection: 'row', gap: 6, marginTop: space.sm, flexWrap: 'wrap' }}>
             <Chip label={analysis.undertone} tone="accent" />
             <Chip label={`${analysis.contrast} contrast`} />
+            <Chip label={`${ready}/${analysis.outfits.length} looks`} />
           </View>
         </View>
 
-        {/* The try-on renders behind the analysis so there is no dead air. */}
-        <Card style={{ padding: space.sm }}>
-          {tryOn ? (
-            <Image
-              source={{ uri: tryOn }}
-              style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: radius.button }}
-              resizeMode="cover"
-            />
-          ) : (
-            <View>
-              {tryOnError ? (
-                <View
-                  style={{
-                    width: '100%',
-                    aspectRatio: 2 / 3,
-                    borderRadius: radius.tile,
-                    backgroundColor: color.surfaceHi,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Text
-                    style={[type.bodyMuted, { textAlign: 'center', paddingHorizontal: space.lg }]}
-                  >
-                    {tryOnError}
-                  </Text>
-                </View>
-              ) : (
-                <>
-                  <Shimmer width={frameWidth} height={frameWidth * 1.5} />
-                  <Image
-                    source={{ uri: original }}
-                    style={{
-                      position: 'absolute',
-                      width: frameWidth,
-                      height: frameWidth * 1.5,
-                      borderRadius: radius.thumb,
-                      opacity: 0.18,
-                    }}
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+          {analysis.outfits.map((look, i) => (
+            <Reveal key={look.register} index={i}>
+              <Pressable onPress={() => setSelected(i)}>
+                {tryOns[i] ? (
+                  <Animated.Image
+                    entering={FadeIn.duration(500)}
+                    source={{ uri: tryOns[i] as string }}
+                    style={{ width: tile, height: tile * 1.5, borderRadius: radius.thumb }}
+                    resizeMode="cover"
                   />
-                  <View style={{ position: 'absolute', bottom: space.md, left: 0, right: 0, alignItems: 'center' }}>
-                    <Chip label="Dressing you" tone="accent" />
+                ) : tryOnErrors[i] ? (
+                  <View style={{ width: tile, height: tile * 1.5, borderRadius: radius.thumb, backgroundColor: color.surfaceHi, alignItems: 'center', justifyContent: 'center', padding: space.sm }}>
+                    <Text style={[type.bodyMuted, { fontSize: 12, textAlign: 'center' }]}>Couldn't render</Text>
                   </View>
-                </>
-              )}
-            </View>
-          )}
-        </Card>
-
-        <Card hero>
-          <Text style={type.caption}>The fit</Text>
-
-          {outfitRows(analysis).map((row, i) => (
-              <View
-                key={row.label}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'flex-start',
-                  gap: space.md,
-                  paddingVertical: space.sm,
-                  borderTopWidth: i === 0 ? 0 : 1,
-                  borderTopColor: color.border,
-                  marginTop: i === 0 ? space.sm : 0,
-                }}
-              >
-                <Text
-                  style={{
-                    width: 62,
-                    fontSize: 10,
-                    fontWeight: '800',
-                    letterSpacing: 1.2,
-                    textTransform: 'uppercase',
-                    color: color.faint,
-                    paddingTop: 3,
-                  }}
-                >
-                  {row.label}
+                ) : (
+                  <View>
+                    <Shimmer width={tile} height={tile * 1.5} borderRadius={radius.thumb} />
+                    <Image
+                      source={{ uri: original }}
+                      style={{ position: 'absolute', width: tile, height: tile * 1.5, borderRadius: radius.thumb, opacity: 0.14 }}
+                    />
+                  </View>
+                )}
+                <Text style={[type.caption, { marginTop: space.xs }]} numberOfLines={1}>
+                  {look.register}
                 </Text>
-                <Text style={[type.body, { flex: 1, fontWeight: '700' }]}>{row.value}</Text>
-              </View>
-            ))}
+              </Pressable>
+            </Reveal>
+          ))}
+        </View>
 
-          <Text
-            style={[
-              type.bodyMuted,
-              { fontSize: 14, marginTop: space.md, paddingTop: space.md, borderTopWidth: 1, borderTopColor: color.border },
-            ]}
-          >
-            {analysis.outfit.why}
-          </Text>
-        </Card>
-
-        <WhereToBuy garments={garments} band={band} onChangeBand={onChangeBand} />
-
-        <Card>
-          <Text style={[type.caption, { marginBottom: space.md }]}>Wear these</Text>
-          <Swatches items={analysis.palette} />
-          <Text style={[type.caption, { marginTop: space.lg, marginBottom: space.md }]}>Never these</Text>
-          <Swatches items={analysis.avoid} />
-        </Card>
+        <Swatches items={analysis.palette} />
 
         <GhostButton label="Try another photo" onPress={onRestart} />
       </ScrollView>

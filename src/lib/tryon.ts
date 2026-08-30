@@ -46,7 +46,7 @@ const pick = (outfit: LooseOutfit, ...keys: string[]): string => {
   return '';
 };
 
-function garmentLines(outfit: Analysis['outfit']): string {
+function garmentLines(outfit: Analysis['outfits'][number]): string {
   const loose = (outfit ?? {}) as unknown as LooseOutfit;
 
   const parts: [string, string][] = [
@@ -64,7 +64,7 @@ function garmentLines(outfit: Analysis['outfit']): string {
   return lines.length ? lines.join('\n') : '- A simple, well-fitted outfit in colours that suit them';
 }
 
-function buildPrompt(outfit: Analysis['outfit']): string {
+function buildPrompt(outfit: Analysis['outfits'][number]): string {
   return `Virtual clothing swap on this exact photograph.
 
 ABSOLUTE RULE: the person in this photo is a specific real human being. Do not
@@ -132,7 +132,7 @@ function isModelUnavailable(status: number, detail: string): boolean {
   );
 }
 
-export async function generateTryOn(uri: string, outfit: Analysis['outfit']): Promise<string> {
+export async function generateTryOn(uri: string, outfit: Analysis['outfits'][number]): Promise<string> {
   const key = process.env.EXPO_PUBLIC_AI_KEY;
   if (!key) throw new Error('No API key');
 

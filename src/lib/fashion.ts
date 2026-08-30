@@ -65,43 +65,57 @@ const AnalysisSchema = z.object({
   avoid: z.array(Swatch).describe('Exactly 3 colours that flatten or drain this colouring.'),
 
   // --- the look ---
-  outfit: z.object({
-    occasion: z.string().describe('Where this outfit is being worn, e.g. "weekday office", "Saturday daytime", "dinner". Under 40 characters.'),
-    formality: z.enum(['casual', 'smart casual', 'business casual', 'smart', 'formal']),
-    scheme: z
-      .enum([
-        'monochromatic',
-        'tonal',
-        'accented neutral',
-        'analogous',
-        'complementary',
-        'achromatic',
-      ])
-      .describe('The colour scheme, chosen to match their contrast level. Low contrast takes tonal or monochromatic; high contrast takes complementary or achromatic.'),
-    silhouette: z
-      .string()
-      .describe('The shape being built, e.g. "fitted knit over full leg — narrow-to-wide V". Under 90 characters.'),
-    top: z
-      .string()
-      .describe('The base upper garment: exact colour + fabric + garment + cut, e.g. "charcoal merino ribbed crewneck, slim through the body".'),
-    bottom: z.string().describe('Exact colour + fabric + garment + cut + rise, e.g. "cream heavy-linen wide-leg trousers, high rise".'),
-    shoes: z.string().describe('Exact colour + material + style, e.g. "dark brown suede derby". Never just "shoes" or "sneakers".'),
-    outerwear: z
-      .string()
-      .describe('The outer layer worn over the top, e.g. "rust corduroy overshirt, boxy". Use an empty string when the look is complete without one.'),
-    accessory: z
-      .string()
-      .describe('One structural accessory that earns its place — a belt, a knit tie, a scarf, a watch strap. Colour and material named. Use an empty string when the look is better without one.'),
-    fabric: z
-      .string()
-      .describe('Why these materials: weight, drape and texture, e.g. "brushed wool holds shape, linen falls straight". Under 110 characters.'),
-    fit: z
-      .string()
-      .describe('Tailoring specifics: rise, break, sleeve and hem placement, tuck. Under 110 characters.'),
-    why: z
-      .string()
-      .describe('One dry sentence tying the outfit to their colouring and proportion. Under 110 characters. No flattery, no exclamation marks.'),
-  }),
+  /**
+   * Six looks, one per register. An array rather than six named fields so the
+   * model produces genuinely parallel options instead of treating one as the
+   * real answer and the rest as afterthoughts.
+   */
+  outfits: z
+    .array(
+      z.object({
+        register: z
+          .enum(['formal', 'business casual', 'smart casual', 'streetwear', 'weekend', 'evening'])
+          .describe('The register this look belongs to. Return all six, in this order, exactly once each.'),
+
+        occasion: z.string().describe('Where this outfit is being worn, e.g. "weekday office", "Saturday daytime", "dinner". Under 40 characters.'),
+        formality: z.enum(['casual', 'smart casual', 'business casual', 'smart', 'formal']),
+        scheme: z
+          .enum([
+            'monochromatic',
+            'tonal',
+            'accented neutral',
+            'analogous',
+            'complementary',
+            'achromatic',
+          ])
+          .describe('The colour scheme, chosen to match their contrast level. Low contrast takes tonal or monochromatic; high contrast takes complementary or achromatic.'),
+        silhouette: z
+          .string()
+          .describe('The shape being built, e.g. "fitted knit over full leg — narrow-to-wide V". Under 90 characters.'),
+        top: z
+          .string()
+          .describe('The base upper garment: exact colour + fabric + garment + cut, e.g. "charcoal merino ribbed crewneck, slim through the body".'),
+        bottom: z.string().describe('Exact colour + fabric + garment + cut + rise, e.g. "cream heavy-linen wide-leg trousers, high rise".'),
+        shoes: z.string().describe('Exact colour + material + style, e.g. "dark brown suede derby". Never just "shoes" or "sneakers".'),
+        outerwear: z
+          .string()
+          .describe('The outer layer worn over the top, e.g. "rust corduroy overshirt, boxy". Use an empty string when the look is complete without one.'),
+        accessory: z
+          .string()
+          .describe('One structural accessory that earns its place — a belt, a knit tie, a scarf, a watch strap. Colour and material named. Use an empty string when the look is better without one.'),
+        fabric: z
+          .string()
+          .describe('Why these materials: weight, drape and texture, e.g. "brushed wool holds shape, linen falls straight". Under 110 characters.'),
+        fit: z
+          .string()
+          .describe('Tailoring specifics: rise, break, sleeve and hem placement, tuck. Under 110 characters.'),
+        why: z
+          .string()
+          .describe('One dry sentence tying the outfit to their colouring and proportion. Under 110 characters. No flattery, no exclamation marks.'),
+      })
+    )
+    .length(6)
+    .describe('Exactly six looks, one per register, in the order listed.'),
 });
 
 export type Analysis = z.infer<typeof AnalysisSchema>;

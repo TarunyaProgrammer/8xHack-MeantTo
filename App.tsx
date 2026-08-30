@@ -22,8 +22,8 @@ export default function App() {
   const [stage, setStage] = useState<Stage>('permission');
   const [photo, setPhoto] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
-  const [tryOn, setTryOn] = useState<string | null>(null);
-  const [tryOnError, setTryOnError] = useState<string | null>(null);
+  const [tryOns, setTryOns] = useState<(string | null)[]>([]);
+  const [tryOnErrors, setTryOnErrors] = useState<(string | null)[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState<'flow' | 'looks' | 'you'>('flow');
   const [looks, setLooks] = useState<Look[]>([]);
@@ -52,16 +52,16 @@ export default function App() {
   const restart = useCallback(() => {
     setPhoto(null);
     setAnalysis(null);
-    setTryOn(null);
-    setTryOnError(null);
+    setTryOns([]);
+    setTryOnErrors([]);
     setStage('pick');
   }, []);
 
   const openLook = useCallback((look: Look) => {
     setPhoto(look.photo);
     setAnalysis(look.analysis);
-    setTryOn(look.tryOn);
-    setTryOnError(null);
+    setTryOns(look.tryOn ? [look.tryOn] : []);
+    setTryOnErrors([]);
     setPage('flow');
     setStage('result');
   }, []);
@@ -69,8 +69,8 @@ export default function App() {
   const onPick = useCallback(async (uri: string) => {
     setPhoto(uri);
     setStage('analysing');
-    setTryOn(null);
-    setTryOnError(null);
+    setTryOns([]);
+    setTryOnErrors([]);
 
     let result: Analysis;
     try {
@@ -93,19 +93,37 @@ export default function App() {
       .then(setLooks)
       .catch(() => {});
 
-    // Try-on runs after the result is already on screen — 25s of dead air is
-    // what kills a demo, not the wait itself.
-    generateTryOn(uri, result.outfit)
-      .then(async (base64) => {
-        // Straight to disk: a base64 PNG is megabytes, and AsyncStorage on
-        // Android cannot read a row that size back out.
-        const image = await saveTryOnImage(id, base64);
-        setTryOn(image);
-        await persist;
-        await updateLookTryOn(id, image);
-        setLooks(await loadLooks());
-      })
-      .catch((err) => setTryOnError(err instanceof Error ? err.message : 'Try-on failed'));
+    // Six renders in parallel, each landing in its own slot so the grid fills
+    // in as they arrive rather than waiting on the slowest.
+    setTryOns(new Array(result.outfits.length).fill(null));
+    setTryOnErrors(new Array(result.outfits.length).fill(null));
+
+    result.outfits.forEach((outfit, i) => {
+      generateTryOn(uri, outfit)
+        .then(async (base64) => {
+          // Straight to disk: a base64 PNG is megabytes, and AsyncStorage on
+          // Android cannot read a row that size back out.
+          const image = await saveTryOnImage(`${id}-${i}`, base64);
+          setTryOns((prev) => {
+            const next = [...prev];
+            next[i] = image;
+            return next;
+          });
+          // Only the first look becomes the history thumbnail.
+          if (i === 0) {
+            await persist;
+            await updateLookTryOn(id, image);
+            setLooks(await loadLooks());
+          }
+        })
+        .catch((err) => {
+          setTryOnErrors((prev) => {
+            const next = [...prev];
+            next[i] = err instanceof Error ? err.message : 'Try-on failed';
+            return next;
+          });
+        });
+    });
   }, []);
 
   const styleFlow = () => {
@@ -148,8 +166,8 @@ export default function App() {
         <StyleResultScreen
           original={photo}
           analysis={analysis}
-          tryOn={tryOn}
-          tryOnError={tryOnError}
+          tryOns={tryOns}
+          tryOnErrors={tryOnErrors}
           onRestart={restart}
         />
       );

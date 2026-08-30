@@ -61,12 +61,17 @@ npx expo start
 
 Open in Expo Go. No development build is required.
 
+**Why SDK 54 and not the latest:** Expo Go on the App Store stops at SDK 54 —
+SDK 55 and later are not published there. Staying on 54 means the app opens in
+the stock Expo Go on any phone, including a judge's, with no provisioning
+profile or sideloaded APK.
+
 The key ships in the bundle via `EXPO_PUBLIC_AI_KEY`, which is acceptable for a
 demo build only. A real release puts it behind a proxy.
 
 ## Stack
 
-Expo SDK 57 · React Native 0.86 · TypeScript · Reanimated · react-native-svg · zod
+Expo SDK 54 · React Native 0.81 · TypeScript · Reanimated · react-native-svg · zod
 
 The Messages API is called directly over `fetch`. The official Anthropic SDK
 imports `node:fs`, `node:path` and `node:crypto` at module load, none of which

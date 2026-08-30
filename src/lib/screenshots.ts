@@ -1,11 +1,4 @@
-import {
-  Album,
-  AssetField,
-  MediaType,
-  Query,
-  getPermissionsAsync,
-  requestPermissionsAsync,
-} from 'expo-media-library';
+import * as MediaLibrary from 'expo-media-library';
 
 /**
  * Screenshots are their own album on both platforms, so this is a filter and
@@ -15,40 +8,30 @@ const ALBUM_NAMES = ['Screenshots', 'Screenshot'];
 
 export const SCAN_LIMIT = 50;
 
-/** Lightweight metadata reads are cheap; cap the count query rather than the album. */
-const COUNT_LIMIT = 10000;
-
 export type PermissionState = 'granted' | 'denied' | 'undetermined';
 
 export async function requestPhotoPermission(): Promise<PermissionState> {
-  const res = await requestPermissionsAsync();
+  const res = await MediaLibrary.requestPermissionsAsync();
   if (res.granted) return 'granted';
   return res.canAskAgain ? 'undetermined' : 'denied';
 }
 
 export async function getPhotoPermission(): Promise<PermissionState> {
-  const res = await getPermissionsAsync();
+  const res = await MediaLibrary.getPermissionsAsync();
   if (res.granted) return 'granted';
   return res.canAskAgain ? 'undetermined' : 'denied';
 }
 
-async function findScreenshotsAlbum(): Promise<Album | null> {
+async function findScreenshotsAlbum(): Promise<MediaLibrary.Album | null> {
   for (const name of ALBUM_NAMES) {
     try {
-      const album = await Album.get(name);
+      const album = await MediaLibrary.getAlbumAsync(name);
       if (album) return album;
     } catch {
-      // Album.get throws on some platforms when the album is absent.
+      // getAlbumAsync rejects on some platforms when the album is absent.
     }
   }
   return null;
-}
-
-function baseQuery(album: Album | null): Query {
-  const query = new Query()
-    .eq(AssetField.MEDIA_TYPE, MediaType.IMAGE)
-    .orderBy({ key: AssetField.CREATION_TIME, ascending: false });
-  return album ? query.album(album) : query;
 }
 
 export interface Screenshot {
@@ -64,23 +47,29 @@ export interface Screenshot {
  */
 export async function listScreenshots(limit = SCAN_LIMIT): Promise<Screenshot[]> {
   const album = await findScreenshotsAlbum();
-  const assets = await baseQuery(album).limit(limit).exe();
 
-  return Promise.all(
-    assets.map(async (asset) => ({
-      assetId: asset.id,
-      uri: await asset.getUri(),
-      takenAt: (await asset.getCreationTime()) ?? Date.now(),
-    }))
-  );
+  const page = await MediaLibrary.getAssetsAsync({
+    first: limit,
+    sortBy: [[MediaLibrary.SortBy.creationTime, false]],
+    mediaType: [MediaLibrary.MediaType.photo],
+    ...(album ? { album } : {}),
+  });
+
+  return page.assets.map((asset) => ({
+    assetId: asset.id,
+    uri: asset.uri,
+    takenAt: asset.creationTime,
+  }));
 }
 
-/**
- * Total screenshots in the album — the headline number on the Verdict screen.
- * Uses metadata-only execution so it stays fast on a large library.
- */
+/** Total screenshots — the headline number on the Verdict screen. */
 export async function countScreenshots(): Promise<number> {
   const album = await findScreenshotsAlbum();
-  const metadata = await baseQuery(album).limit(COUNT_LIMIT).exeForMetadata();
-  return metadata.length;
+  if (album) return album.assetCount ?? 0;
+
+  const page = await MediaLibrary.getAssetsAsync({
+    first: 1,
+    mediaType: [MediaLibrary.MediaType.photo],
+  });
+  return page.totalCount ?? 0;
 }

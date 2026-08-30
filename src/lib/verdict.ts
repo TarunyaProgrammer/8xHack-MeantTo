@@ -1,4 +1,4 @@
-import { EFFORT, MODEL, getClient } from './anthropic';
+import { askText } from './anthropic';
 import { Item, ItemType, TYPE_LABEL, emptyCounts } from '../types';
 
 /** Counts come from the real extracted items. Nothing here is hardcoded. */
@@ -61,11 +61,8 @@ export async function generateVerdictLine(
   const table = rows.map((r) => `${r.count} ${r.label}`).join('\n');
 
   try {
-    const response = await getClient().messages.create({
-      model: MODEL,
-      max_tokens: 200,
-      output_config: { effort: EFFORT },
-      system: `You write one closing line for a screen that has just shown someone
+    const line = await askText(
+      `You write one closing line for a screen that has just shown someone
 the truth about their screenshot folder.
 
 Use only the numbers given. Never invent a number. Be specific and dry — the
@@ -74,16 +71,8 @@ marks, no encouragement, no advice. Return the line only.
 
 Good: "You did 3 of them."
 Bad: "You have many unfinished tasks!"`,
-      messages: [
-        {
-          role: 'user',
-          content: `${totalScreenshots} screenshots.\n${table}\nActed on: ${done}`,
-        },
-      ],
-    });
-
-    const text = response.content.find((b) => b.type === 'text');
-    const line = text && text.type === 'text' ? text.text.trim() : '';
+      `${totalScreenshots} screenshots.\n${table}\nActed on: ${done}`
+    );
     return line || fallbackLine(rows.length, done);
   } catch {
     return fallbackLine(rows.length, done);

@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { SaveFormat, manipulateAsync } from 'expo-image-manipulator';
-import { EFFORT, MODEL, getClient } from './anthropic';
+import { askStructured } from './anthropic';
 import { Screenshot } from './screenshots';
 import { Item, ItemType } from '../types';
 
@@ -67,23 +66,10 @@ function stripEmpty(payload: Record<string, string>): Record<string, string> {
 async function extractOne(shot: Screenshot): Promise<Item> {
   const data = await toBase64(shot.uri);
 
-  const response = await getClient().messages.parse({
-    model: MODEL,
-    max_tokens: 1024,
-    system: SYSTEM,
-    output_config: { effort: EFFORT, format: zodOutputFormat(ExtractionSchema) },
-    messages: [
-      {
-        role: 'user',
-        content: [
-          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data } },
-          { type: 'text', text: 'What did this screenshot mean to do?' },
-        ],
-      },
-    ],
-  });
-
-  const parsed = response.parsed_output;
+  const parsed = await askStructured(ExtractionSchema, SYSTEM, [
+    { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data } },
+    { type: 'text', text: 'What did this screenshot mean to do?' },
+  ]);
 
   return {
     id: shot.assetId,

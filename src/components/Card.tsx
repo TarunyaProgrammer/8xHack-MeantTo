@@ -2,9 +2,14 @@ import React from 'react';
 import { View, ViewProps, StyleSheet } from 'react-native';
 import { color, radius, shadow, space } from '../theme/tokens';
 
-export function Card({ style, children, ...rest }: ViewProps) {
+interface Props extends ViewProps {
+  /** Lifts the panel and hardens the border — for the one card that matters. */
+  hero?: boolean;
+}
+
+export function Card({ style, children, hero, ...rest }: Props) {
   return (
-    <View style={[styles.card, style]} {...rest}>
+    <View style={[styles.card, hero && styles.hero, style]} {...rest}>
       {children}
     </View>
   );
@@ -12,11 +17,12 @@ export function Card({ style, children, ...rest }: ViewProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: color.bg,
+    backgroundColor: color.surface,
     borderRadius: radius.card,
     borderWidth: 1,
     borderColor: color.border,
     padding: space.lg,
     ...shadow.card,
   },
+  hero: { backgroundColor: color.surfaceHi, borderColor: color.borderHi },
 });

@@ -24,13 +24,14 @@ export function GhostButton({ label, onPress, style, tone = 'default' }: Props) 
 
 const styles = StyleSheet.create({
   button: {
-    height: 52,
+    height: 56,
     borderRadius: radius.button,
-    borderWidth: 1,
-    borderColor: color.border,
+    borderWidth: 1.5,
+    borderColor: color.borderHi,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 24,
   },
-  pressed: { opacity: 0.6 },
-  label: { fontSize: 16, fontWeight: '600' },
+  pressed: { opacity: 0.55, transform: [{ scale: 0.98 }] },
+  label: { fontSize: 16, fontWeight: '700', letterSpacing: -0.2 },
 });

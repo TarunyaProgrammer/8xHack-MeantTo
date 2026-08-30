@@ -26,6 +26,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.meantto.app",
       "permissions": [
+        "android.permission.CAMERA",
         "READ_MEDIA_IMAGES",
         "READ_EXTERNAL_STORAGE",
         "READ_CONTACTS",
@@ -69,12 +70,27 @@
         {
           "calendarPermission": "Meant To adds events found in your screenshots."
         }
-      ]
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Fitted uses your camera so you can take a full-body photo to style.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {
         "projectId": "36e3a304-2f82-49c9-9e00-73e0acdf4856"
       }
     },
+    "owner": "rakshit1256",
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#EFEFEC"
+    },
+    "backgroundColor": "#EFEFEC"
   }
 }

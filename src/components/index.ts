@@ -1,3 +1,4 @@
+export { HeroImage } from './HeroImage';
 export { Card } from './Card';
 export { Chip } from './Chip';
 export { CountUp } from './CountUp';
@@ -5,5 +6,8 @@ export { GhostButton } from './GhostButton';
 export { Icon } from './Icon';
 export type { IconName } from './Icon';
 export { PrimaryButton } from './PrimaryButton';
+export { Reveal } from './Reveal';
+export { Shimmer } from './Shimmer';
 export { Screen } from './Screen';
 export { StatRow } from './StatRow';
+export { ShopSheet } from './ShopSheet';

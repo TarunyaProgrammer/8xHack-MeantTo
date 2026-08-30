@@ -45,19 +45,25 @@ async function saveContacts(items: Item[]): Promise<number> {
 
   let saved = 0;
   for (const item of candidates) {
-    await Contacts.Contact.create({
-      ...displayName(item.payload.name),
-      phones: [{ label: 'mobile', number: item.payload.phone }],
+    const { givenName, familyName } = displayName(item.payload.name);
+    await Contacts.addContactAsync({
+      name: item.payload.name,
+      firstName: givenName,
+      ...(familyName ? { lastName: familyName } : {}),
+      contactType: Contacts.ContactTypes.Person,
+      phoneNumbers: [
+        { label: 'mobile', number: item.payload.phone, isPrimary: true, id: item.id },
+      ],
       note: 'Saved by Meant To',
-    });
+    } as Contacts.Contact);
     saved += 1;
   }
   return saved;
 }
 
 /** Picks a writable calendar rather than assuming one exists. */
-async function writableCalendar(): Promise<Calendar.ExpoCalendar | null> {
-  const calendars = await Calendar.getCalendars();
+async function writableCalendar(): Promise<Calendar.Calendar | null> {
+  const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
   return calendars.find((c) => c.allowsModifications) ?? calendars[0] ?? null;
 }
 
@@ -65,7 +71,7 @@ async function addEvents(items: Item[]): Promise<number> {
   const candidates = items.filter((i) => i.type === 'event' && i.payload.title);
   if (candidates.length === 0) return 0;
 
-  const permission = await Calendar.requestCalendarPermissions();
+  const permission = await Calendar.requestCalendarPermissionsAsync();
   if (!permission.granted) throw new Error('Calendar access denied');
 
   const calendar = await writableCalendar();
@@ -79,7 +85,7 @@ async function addEvents(items: Item[]): Promise<number> {
     const start = Number.isFinite(parsed) ? new Date(parsed) : new Date();
     const end = new Date(start.getTime() + 60 * 60 * 1000);
 
-    await calendar.createEvent({
+    await Calendar.createEventAsync(calendar.id, {
       title: item.payload.title,
       startDate: start,
       endDate: end,

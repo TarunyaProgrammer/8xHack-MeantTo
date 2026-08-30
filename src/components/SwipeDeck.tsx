@@ -107,7 +107,7 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
   });
 
   return (
-    <View style={{ height: cardH + 76, alignItems: 'center', justifyContent: 'flex-start' }}>
+    <View style={{ height: cardH + 132, alignItems: 'center', justifyContent: 'flex-start' }}>
       {Array.from({ length: Math.min(VISIBLE, items.length) }, (_, depth) => depth)
         // Furthest first, so the active card ends up last and therefore on top.
         .reverse()
@@ -189,11 +189,6 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
           );
         })}
 
-      <View style={styles.dots}>
-        {items.map((item, i) => (
-          <View key={item.key} style={[styles.dot, i === top && styles.dotOn]} />
-        ))}
-      </View>
     </View>
   );
 }
@@ -230,7 +225,4 @@ const styles = StyleSheet.create({
     backgroundColor: color.accent,
   },
   ctaText: { color: color.onAccent, fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
-  dots: { flexDirection: 'row', gap: 6, justifyContent: 'center', position: 'absolute', bottom: 0 },
-  dot: { width: 6, height: 6, borderRadius: 999, backgroundColor: color.borderHi },
-  dotOn: { backgroundColor: color.ink, width: 20 },
 });

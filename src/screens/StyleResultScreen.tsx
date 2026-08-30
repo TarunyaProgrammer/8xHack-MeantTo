@@ -45,30 +45,6 @@ function outfitRows(look: Look): { label: string; value: string }[] {
   return rows;
 }
 
-function Swatches({ items }: { items: { hex: string; name: string }[] }) {
-  return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, justifyContent: 'space-between' }}>
-      {items.map((c) => (
-        <View key={c.hex + c.name} style={{ alignItems: 'center', width: 78 }}>
-          <View
-            style={{
-              width: 62,
-              height: 62,
-              borderRadius: radius.thumb,
-              backgroundColor: c.hex,
-              borderWidth: 1,
-              borderColor: color.borderHi,
-            }}
-          />
-          <Text style={{ fontSize: 11, fontWeight: '600', color: color.muted, marginTop: 6 }} numberOfLines={2}>
-            {c.name}
-          </Text>
-        </View>
-      ))}
-    </View>
-  );
-}
-
 export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, selected, onSelect, onRestart }: Props) {
   const { width } = useWindowDimensions();
   const [band, setBand] = useState<PriceBandId>(DEFAULT_BAND);
@@ -169,8 +145,6 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, sel
             error: tryOnErrors[i] ?? null,
           }))}
         />
-
-        <Swatches items={analysis.palette} />
 
         <GhostButton label="Try another photo" onPress={onRestart} />
       </ScrollView>

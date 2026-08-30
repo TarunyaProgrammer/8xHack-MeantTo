@@ -1,3 +1,5 @@
+export { LookDeck } from './LookDeck';
+export type { DeckItem } from './LookDeck';
 export { HeroImage } from './HeroImage';
 export { Card } from './Card';
 export { Chip } from './Chip';

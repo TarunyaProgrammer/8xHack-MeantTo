@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import { Card, Chip, GhostButton, Reveal, Screen, Shimmer } from '../components';
+import { Card, Chip, GhostButton, LookDeck, Screen, Shimmer } from '../components';
 import { WhereToBuy } from '../components/WhereToBuy';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
@@ -71,7 +71,6 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onR
     void loadPriceBand().then(setBand);
   }, []);
 
-  const tile = (width - space.lg * 2 - space.sm) / 2;
   const ready = tryOns.filter(Boolean).length;
 
   if (selected !== null) {
@@ -153,37 +152,17 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, onR
           </View>
         </View>
 
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
-          {analysis.outfits.map((look, i) => (
-            <Reveal key={look.register} index={i}>
-              <Pressable onPress={() => setSelected(i)}>
-                {tryOns[i] ? (
-                  <Animated.Image
-                    entering={FadeIn.duration(500)}
-                    source={{ uri: tryOns[i] as string }}
-                    style={{ width: tile, height: tile * 1.5, borderRadius: radius.thumb }}
-                    resizeMode="cover"
-                  />
-                ) : tryOnErrors[i] ? (
-                  <View style={{ width: tile, height: tile * 1.5, borderRadius: radius.thumb, backgroundColor: color.surfaceHi, alignItems: 'center', justifyContent: 'center', padding: space.sm }}>
-                    <Text style={[type.bodyMuted, { fontSize: 12, textAlign: 'center' }]}>Couldn't render</Text>
-                  </View>
-                ) : (
-                  <View>
-                    <Shimmer width={tile} height={tile * 1.5} borderRadius={radius.thumb} />
-                    <Image
-                      source={{ uri: original }}
-                      style={{ position: 'absolute', width: tile, height: tile * 1.5, borderRadius: radius.thumb, opacity: 0.14 }}
-                    />
-                  </View>
-                )}
-                <Text style={[type.caption, { marginTop: space.xs }]} numberOfLines={1}>
-                  {look.register}
-                </Text>
-              </Pressable>
-            </Reveal>
-          ))}
-        </View>
+        <LookDeck
+          original={original}
+          onOpen={setSelected}
+          items={analysis.outfits.map((look, i) => ({
+            key: look.register,
+            label: look.register,
+            caption: look.top,
+            image: tryOns[i] ?? null,
+            error: tryOnErrors[i] ?? null,
+          }))}
+        />
 
         <Swatches items={analysis.palette} />
 

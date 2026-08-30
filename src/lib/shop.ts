@@ -178,6 +178,20 @@ function ajioBuckets(band: { min: number; max: number }): string {
   return `&query=%3Arelevance${facets}&gridColumns=3`;
 }
 
+/**
+ * The app only styles menswear, but a bare garment search ("merino crewneck")
+ * returns women's listings on all three retailers. Prefixing the keyword scopes
+ * the results without relying on a department parameter — Amazon's `i=apparel`
+ * is unverified here and Myntra's gender facet is a separate filter key, so a
+ * keyword is the one mechanism all three definitely honour.
+ *
+ * Skipped when the description already says men's, so the query does not read
+ * "men men's navy linen shirt".
+ */
+function menswear(description: string): string {
+  return /\bmen(?:'|\u2019)?s?(?:wear)?\b/i.test(description) ? description : `men ${description}`;
+}
+
 /** Myntra routes search through a path slug, e.g. /navy-linen-shirt. */
 function slugify(query: string): string {
   return query
@@ -192,8 +206,9 @@ function slugify(query: string): string {
  * placeholders — just links out.
  */
 export function shopLinks(description: string, bandId: PriceBandId): ShopLink[] {
-  const query = description.trim();
-  if (!query) return [];
+  const trimmed = description.trim();
+  if (!trimmed) return [];
+  const query = menswear(trimmed);
 
   const band = resolveBand(bandId);
   const q = encodeURIComponent(query);

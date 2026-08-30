@@ -61,7 +61,9 @@ function garmentLines(outfit: Analysis['outfits'][number]): string {
     .filter(([, value]) => value.length > 0)
     .map(([label, value]) => `- ${label}: ${value}`);
 
-  return lines.length ? lines.join('\n') : '- A simple, well-fitted outfit in colours that suit them';
+  return lines.length
+    ? lines.join('\n')
+    : "- A simple, well-fitted men's outfit — shirt or knit, trousers, shoes — in colours that suit them";
 }
 
 function buildPrompt(outfit: Analysis['outfits'][number]): string {
@@ -84,6 +86,12 @@ MUST REMAIN IDENTICAL — carry these through from the input untouched:
 
 CHANGE ONLY THE GARMENTS the person is wearing. Replace them with:
 ${garmentLines(outfit)}
+
+MENSWEAR ONLY. Every replacement garment must be a men's garment, whoever is in
+the photo. Do not render a dress, a gown, a skirt, a blouse, a crop top,
+leggings, tights, heels, pumps, mary janes or ballet flats under any
+circumstance. The lower body wears trousers, jeans or tailored shorts. If the
+list above is ambiguous, resolve it to the men's version of the garment.
 
 The new garments must be photorealistic, drape naturally over this person's
 actual body with realistic fabric folds, seams and shadows, and sit in the same

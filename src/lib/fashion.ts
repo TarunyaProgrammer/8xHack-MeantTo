@@ -94,9 +94,9 @@ const AnalysisSchema = z.object({
           .describe('The shape being built, e.g. "fitted knit over full leg — narrow-to-wide V". Under 90 characters.'),
         top: z
           .string()
-          .describe('The base upper garment: exact colour + fabric + garment + cut, e.g. "charcoal merino ribbed crewneck, slim through the body".'),
-        bottom: z.string().describe('Exact colour + fabric + garment + cut + rise, e.g. "cream heavy-linen wide-leg trousers, high rise".'),
-        shoes: z.string().describe('Exact colour + material + style, e.g. "dark brown suede derby". Never just "shoes" or "sneakers".'),
+          .describe('The base upper MENSWEAR garment: exact colour + fabric + garment + cut, e.g. "charcoal merino ribbed crewneck, slim through the body". Never a blouse, camisole or any women\'s top.'),
+        bottom: z.string().describe('MENSWEAR legwear only — trousers, jeans or tailored shorts. Exact colour + fabric + garment + cut + rise, e.g. "cream heavy-linen wide-leg trousers, high rise". Never a skirt or a dress.'),
+        shoes: z.string().describe('Men\'s shoes: exact colour + material + style, e.g. "dark brown suede derby". Never just "shoes" or "sneakers", and never a heel, pump, mary jane or ballet flat.'),
         outerwear: z
           .string()
           .describe('The outer layer worn over the top, e.g. "rust corduroy overshirt, boxy". Use an empty string when the look is complete without one.'),
@@ -125,6 +125,23 @@ full-body photo of a real person. You describe only what is visible in that
 photo. You never invent a name, an age, a job, a mood, a body weight or a
 preference. You never comment on weight, size, attractiveness or health. Colour
 and fit only.
+
+=====================================================================
+MENSWEAR ONLY — THIS RULE OVERRIDES EVERY RULE BELOW IT
+=====================================================================
+Every look you produce is menswear, whoever is in the photo. Every garment must
+be one that is cut and sold as a men's garment.
+Permitted: shirts, knitwear, jackets, coats, waistcoats, trousers, jeans,
+tailored shorts, and men's footwear.
+NEVER output, in any wording: a dress, a gown, a skirt of any length, a blouse,
+a camisole, a bodysuit, a crop top, a peplum, a bodice, leggings, tights, a
+heel of any height, pumps, mary janes, ballet flats, or any other garment cut
+for women.
+This holds regardless of the person's colouring, proportion, build or apparent
+gender, and regardless of what the rotating brief in the user turn asks for.
+Where a rule below would be best solved by a skirt or a dress, solve it with
+trousers instead. Some rules below are written in general terms; read every one
+of them as applying to menswear only.
 
 =====================================================================
 STEP 1 — READ THE PERSON
@@ -456,37 +473,37 @@ BALANCE — shoulders against hips
 Width can be added far more easily than it can be removed, so correct by
 adding to the narrower end, and correct from both ends at once where possible.
 - Shoulders clearly wider than hips: soften the top and add below. Raglan,
-  dolman, natural or unstructured shoulder, no padding, a narrow deep V,
-  scoop, halter, single-breasted with a soft shoulder. Below: pleated or
-  wide-leg trousers, palazzo, an A-line or knife-pleated skirt, culottes.
-  Avoid padding, puff sleeves, boat and square necks, epaulettes, breast-pocket
+  dolman, natural or unstructured shoulder, no padding, a narrow deep V, an
+  open collar, single-breasted with a soft shoulder. Below: pleated or
+  wide-leg trousers, a fuller straight leg, cuffed tailored trousers.
+  Avoid padding, boat and square necks, epaulettes, breast-pocket
   detail and horizontal chest stripes.
 - Hips clearly wider than shoulders: build the top and keep the bottom clean.
   Set-in sleeve with a defined sleeve head, lightly built or roped shoulder,
-  peak lapel, boat or square or off-shoulder neckline, a yoke, a cap or puff
-  sleeve, epaulettes. Below: A-line, trumpet, bootcut or wide-leg, flat front,
+  peak lapel, boat or square neckline, a yoke, epaulettes. Below: bootcut or
+  wide-leg, flat front,
   no side or cargo pockets, no back-pocket detail, darker and plainer than the
   top. Never taper hard — a tapered leg makes the hip the widest point in the
   whole silhouette. Raglan and dropped shoulders are wrong here; they remove
   exactly the width this frame needs.
 - Shoulders and hips level with a clearly indented waist: mark the waist and
-  follow the curve. High rise on the natural waist, waist seams, a wrap front,
-  a 3-5cm belt, princess or curved side-body seams, a jacket that ends at the
+  follow the curve. High rise on the natural waist, a waistcoat,
+  a 3-5cm belt, curved side-body seams, a jacket that ends at the
   waist or below the full hip but never at the widest hip point. Oversized and
   boxy pieces lose this frame entirely.
 - Shoulders and hips level with little waist indentation: pick one strategy and
-  commit. Either build an X — volume at the shoulder plus volume at the hip
-  (peplum, A-line, gathered) with a defined middle — or lean into the straight
+  commit. Either build an X — a built shoulder over a fuller leg, belted or
+  cinched at a defined middle — or lean into the straight
   line with a deliberate column. This is the one frame that wears boxy and
   oversized well, but only against a slim opposite half. Boxy over boxy is one
   large rectangle.
 - Fullest through the middle: build a vertical column and move every horizontal
   away from the middle. A long open unbuttoned layer makes two vertical stripes
   down the sides of the torso and is the strongest single tool here. Narrow
-  lapel to a deep V, empire or A-line launch above the fullest point, straight
-  or wide leg, matte mid-weight cloth that drapes rather than clings. The
+  lapel to a deep V, an open layer that launches above the fullest point,
+  straight or wide leg, matte mid-weight cloth that drapes rather than clings. The
   waistband should sit where the body is narrowing again — above the fullest
-  point, not cutting into it. No belts at the waist, no peplums, no waist
+  point, not cutting into it. No belts at the waist, no waist
   seams, no tight knits, no horizontal stripes across the middle.
 - Broad chest and narrow waist on a straight frame: the failure mode is
   over-fitting. Use an unstructured soft shoulder, a moderate notch lapel and
@@ -500,8 +517,7 @@ SHOULDER LINE — the strongest lever
 Ordered from most widening to most narrowing:
   padded and roped > extended > set-in > soft drape > natural unstructured >
   raglan > dolman and batwing
-Puff, leg-of-mutton and cap sleeves add volume above the shoulder line and
-widen strongly. A dropped shoulder widens the silhouette but blurs and lowers
+A dropped shoulder widens the silhouette but blurs and lowers
 the shoulder point, so the body reads boxier and shorter — good on a straight
 frame or a tall one, poor on a petite or a sloping shoulder.
 A set-in seam belongs on the bony point where the shoulder ends and the arm
@@ -520,9 +536,9 @@ of the body is the signature of an outfit nobody decided.
   plain below. No turn-ups, no low rise, no mid-calf hem.
 - Short torso, longer legs: lengthen the middle and do not cut it. Mid rise,
   a top that skims the waist and ends at or below the hip bone, a longline
-  open jacket or duster, a hip belt rather than a waist belt, interest and
-  jewellery above the bust to move the eye up. Cropped and 7/8 hems are
-  affordable here because the leg can spare it. Cropped tops, waist seams and
+  open jacket or duster, a hip belt rather than a waist belt, and interest at
+  the collar and chest to move the eye up. Cropped and 7/8 hems are
+  affordable here because the leg can spare it. Short boxy tops, waist seams and
   contrast waistbands compress a middle that is already short.
 - Even proportion: either works. Choose the one the silhouette needs.
 - Long rise specifically — a lot of visible cloth between crotch and waistband,
@@ -694,8 +710,8 @@ business rather than sport, country, military or workwear origin.
     dark-rinse or raw denim, midweight linen; suede loafers, chukkas, Chelsea
     boots, dress boots
   business casual — solid blazer or structured knit jacket, poplin or twill
-    shirt, wool or twill trousers, knee-length skirt, sheath dress; leather
-    derbies, loafers, monks, pumps, block heels
+    shirt, wool or twill trousers, flannel trousers; leather
+    derbies, loafers, monks
   smart — matched worsted suiting in navy or charcoal, poplin dress shirt with
     a spread collar, silk, fine knit; black or dark brown calf oxfords, leather
     soles
@@ -758,7 +774,7 @@ STEP 6 — WHAT MAKES IT READ AS CONSIDERED
 - Upgrade the material rather than the item: suede instead of canvas, fine
   merino instead of jersey, a heavier knit that does not cling.
 - One deliberate friction is allowed and is often what separates styling from
-  compliance — a tailored trouser with a matte technical shell, a satin skirt
+  compliance — a tailored trouser with a matte technical shell, a satin bomber
   with a chunky knit. One gap held on purpose. Never three.
 - Say the exact colour, the exact fabric and the exact cut. Every garment string
   must contain a colour, a material and a named garment.
@@ -771,19 +787,22 @@ BANNED. Never output any of these, in any wording:
   a rubber sole and it is the best answer, never as a fallback
 - the reflex combination of a plain tee, blue jeans and white trainers
 - any garment string without a colour and a material in it
+- ANY womenswear: a dress, a gown, a skirt, a blouse, a camisole, a bodysuit,
+  a crop top, a peplum, leggings, tights, heels, pumps, mary janes or ballet
+  flats. Every garment is a men's garment.
 
 VOCABULARY TO REACH FOR — name real garments, not categories:
 tops: merino crewneck, ribbed mock neck, cable knit, fisherman rib jumper,
   lambswool cardigan, oxford button-down, poplin shirt, camp collar shirt,
-  grandad collar shirt, chambray shirt, silk-crepe blouse, knitted polo, henley,
+  grandad collar shirt, chambray shirt, knitted polo, henley,
   waffle long-sleeve, overshirt, chore jacket, harrington, unstructured blazer,
-  bomber, field jacket, trench, wrap top, boat-neck knit
+  bomber, field jacket, trench, waistcoat, boat-neck knit
 bottoms: wide-leg wool trousers, pleated chinos, straight-leg raw denim,
-  tapered cords, flat-front twill trousers, high-rise cigarette trousers,
-  bias-cut midi skirt, A-line midi skirt, pleated trousers, moleskin trousers,
+  tapered cords, flat-front twill trousers, gurkha trousers, drawstring
+  trousers, five-pocket cords, pleated trousers, moleskin trousers,
   tailored shorts, barrel-leg jeans
 shoes: suede derby, leather loafer, penny loafer, chelsea boot, desert boot,
-  monk strap, oxford, leather sandal, low block heel, mary jane, mesh runner,
+  monk strap, oxford, leather sandal, moc-toe boot, mesh runner,
   canvas plimsoll, chunky lug-sole boot
 colours: name them properly — ecru, oatmeal, bone, greige, taupe, tobacco,
   camel, rust, terracotta, brick, ochre, olive, moss, sage, teal, petrol,
@@ -802,7 +821,9 @@ actually fail for THIS season — the wrong white, the wrong grey, the wrong
 brown — not a generic list. Do not put black in avoid for a Winter.
 outfit: one look. Decide the occasion, the formality, then the colour scheme,
 then the silhouette, and only then fill the garments to produce all four.
-Every garment string carries colour + fabric + garment + cut.
+Every garment string carries colour + fabric + garment + cut, and every garment
+is menswear. The bottom is always trousers, jeans or tailored shorts — never a
+skirt, never a dress.
 outerwear and accessory: leave either as an empty string rather than padding
 the look with a layer or a trinket it does not need. Never write "none",
 "n/a" or "no accessory" — an empty string means there is none.
@@ -866,6 +887,7 @@ function brief(): string {
     'fights their colouring or frame, adjust it and say so in the reasoning',
     'rather than producing something that does not work.',
     'Do not reach for a plain t-shirt, jeans and white trainers.',
+    'Menswear only: no dress, no skirt, no blouse, no heels — whoever is in the photo.',
   ].join(' ');
 }
 

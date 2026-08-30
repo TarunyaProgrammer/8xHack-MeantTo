@@ -4,6 +4,7 @@ import { Chip, Icon, PrimaryButton, Screen } from '../components';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Photo, listRecentPhotos } from '../lib/photos';
+import { CAN_PICK_FILE, pickFile } from '../lib/pickFile';
 
 interface Props {
   onPick: (uri: string) => void;
@@ -83,10 +84,21 @@ export function PickPhotoScreen({ onPick, onCamera, onLooks, onYou }: Props) {
           })}
         </View>
 
-        {photos !== null && photos.length === 0 && (
+        {photos !== null && photos.length === 0 && !CAN_PICK_FILE && (
           <Text style={type.bodyMuted}>No photos found.</Text>
         )}
       </ScrollView>
+
+      {CAN_PICK_FILE && (
+        <PrimaryButton
+          label="Choose a photo"
+          onPress={async () => {
+            const uri = await pickFile();
+            if (uri) onPick(uri);
+          }}
+          style={{ marginTop: space.md }}
+        />
+      )}
 
       <PrimaryButton
         label="Style me"

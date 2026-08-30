@@ -47,7 +47,14 @@
       ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "output": "single",
+      "name": "Fitted",
+      "shortName": "Fitted",
+      "themeColor": "#0E0E0E",
+      "backgroundColor": "#EFEFEC",
+      "display": "standalone"
     },
     "scheme": "meantto",
     "plugins": [

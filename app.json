@@ -26,6 +26,7 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.meantto.app",
       "permissions": [
+        "android.permission.CAMERA",
         "READ_MEDIA_IMAGES",
         "READ_EXTERNAL_STORAGE",
         "READ_CONTACTS",
@@ -68,6 +69,14 @@
         "expo-calendar",
         {
           "calendarPermission": "Meant To adds events found in your screenshots."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Fitted uses your camera so you can take a full-body photo to style.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
         }
       ]
     ],

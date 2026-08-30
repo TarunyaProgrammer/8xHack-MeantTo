@@ -19,8 +19,8 @@ export function ScanningScreen({ done, total }: Props) {
   return (
     <Screen center>
       <View style={{ alignItems: 'center' }}>
-        <Text style={type.number}>{done}</Text>
-        <Text style={[type.caption, { marginTop: space.xs }]}>Reading your screenshots</Text>
+        <Text style={type.number}>{total > 0 ? done : ''}</Text>
+        <Text style={[type.caption, { marginTop: space.xs }]}>Reading your colours</Text>
 
         <View style={styles.track}>
           <View style={[styles.fill, { width: `${Math.round(progress * 100)}%` }]} />

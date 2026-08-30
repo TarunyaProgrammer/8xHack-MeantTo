@@ -16,7 +16,10 @@ export type IconName =
   | 'check'
   | 'trash'
   | 'alert'
-  | 'share';
+  | 'share'
+  | 'camera'
+  | 'flip'
+  | 'close';
 
 interface Props {
   name: IconName;
@@ -96,6 +99,29 @@ export function Icon({ name, size = 20, color = palette.ink, strokeWidth = 1.8 }
           <Path d="M12 15.4V4.2" {...common} />
           <Path d="M8.2 7.8 12 4l3.8 3.8" {...common} />
           <Path d="M5.6 13.4v5.2a1.8 1.8 0 0 0 1.8 1.8h9.2a1.8 1.8 0 0 0 1.8-1.8v-5.2" {...common} />
+        </>
+      )}
+      {name === 'camera' && (
+        <>
+          <Path
+            d="M4.4 7.9h2.9l1.4-2.3h6.6l1.4 2.3h2.9a1.8 1.8 0 0 1 1.8 1.8v7.9a1.8 1.8 0 0 1-1.8 1.8H4.4a1.8 1.8 0 0 1-1.8-1.8V9.7a1.8 1.8 0 0 1 1.8-1.8Z"
+            {...common}
+          />
+          <Circle cx={12} cy={13.4} r={3.4} {...common} />
+        </>
+      )}
+      {name === 'flip' && (
+        <>
+          <Path d="M3.6 12a8.4 8.4 0 0 1 14.1-6.2" {...common} />
+          <Path d="M13.9 5.9h4V2" {...common} />
+          <Path d="M20.4 12a8.4 8.4 0 0 1-14.1 6.2" {...common} />
+          <Path d="M10.1 18.1h-4V22" {...common} />
+        </>
+      )}
+      {name === 'close' && (
+        <>
+          <Line x1={6.6} y1={6.6} x2={17.4} y2={17.4} {...common} strokeWidth={2} />
+          <Line x1={17.4} y1={6.6} x2={6.6} y2={17.4} {...common} strokeWidth={2} />
         </>
       )}
     </Svg>

@@ -16,21 +16,21 @@ export function PermissionScreen({ permission, onScan }: Props) {
   return (
     <Screen center>
       <View style={{ marginBottom: space.xxl }}>
-        <Text style={type.display}>Meant To</Text>
+        <Text style={type.display}>Fitted</Text>
         <Text style={[type.bodyMuted, { marginTop: space.xs }]}>
-          Your screenshots are a to-do list.
+          Your colours, from your own photo.
         </Text>
       </View>
 
       {blocked ? (
         <>
           <Text style={[type.body, { color: color.muted, marginBottom: space.md }]}>
-            Photo access is off. Turn it on to read your Screenshots album.
+            Photo access is off. Turn it on to pick a photo.
           </Text>
           <GhostButton label="Open Settings" onPress={() => Linking.openSettings()} />
         </>
       ) : (
-        <PrimaryButton label="Scan my phone" onPress={onScan} />
+        <PrimaryButton label="Get started" onPress={onScan} />
       )}
     </Screen>
   );

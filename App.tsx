@@ -3,28 +3,29 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PermissionScreen } from './src/screens/PermissionScreen';
 import { ScanningScreen } from './src/screens/ScanningScreen';
-import { VerdictScreen } from './src/screens/VerdictScreen';
-import { ResultsScreen } from './src/screens/ResultsScreen';
-import { ExecutingScreen } from './src/screens/ExecutingScreen';
+import { PickPhotoScreen } from './src/screens/PickPhotoScreen';
+import { CameraScreen } from './src/screens/CameraScreen';
+import { StyleResultScreen } from './src/screens/StyleResultScreen';
 import { MessageScreen } from './src/screens/MessageScreen';
-import { useScan } from './src/lib/useScan';
 import { PermissionState, getPhotoPermission, requestPhotoPermission } from './src/lib/screenshots';
-import { actionableCount } from './src/lib/verdict';
-import { ActionOutcome, buildSteps } from './src/lib/actions';
+import { Analysis, analysePhoto, generateTryOn } from './src/lib/style';
 
-type Stage = 'permission' | 'verdict' | 'executing' | 'results';
+type Stage = 'permission' | 'pick' | 'camera' | 'analysing' | 'result' | 'error';
 
 export default function App() {
   const [permission, setPermission] = useState<PermissionState>('undetermined');
   const [stage, setStage] = useState<Stage>('permission');
-  const [outcomes, setOutcomes] = useState<ActionOutcome[]>([]);
-  const scan = useScan();
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
+  const [tryOn, setTryOn] = useState<string | null>(null);
+  const [tryOnError, setTryOnError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void getPhotoPermission().then(setPermission);
   }, []);
 
-  const startScan = useCallback(async () => {
+  const start = useCallback(async () => {
     let state = permission;
     if (state !== 'granted') {
       try {
@@ -34,80 +35,71 @@ export default function App() {
       }
       setPermission(state);
     }
+    setStage('pick');
+  }, [permission]);
 
-    // Run regardless of the exact permission verdict. Partial access still
-    // returns real screenshots, and anything that genuinely fails surfaces as
-    // a visible error rather than a button that does nothing.
-    setStage('verdict');
-    await scan.run();
-  }, [permission, scan]);
-
-  const rescan = useCallback(() => {
-    setOutcomes([]);
-    setStage('permission');
+  const restart = useCallback(() => {
+    setPhoto(null);
+    setAnalysis(null);
+    setTryOn(null);
+    setTryOnError(null);
+    setStage('pick');
   }, []);
 
-  const finishExecuting = useCallback((results: ActionOutcome[]) => {
-    setOutcomes(results);
-    setStage('results');
+  const onPick = useCallback(async (uri: string) => {
+    setPhoto(uri);
+    setStage('analysing');
+    setTryOn(null);
+    setTryOnError(null);
+
+    try {
+      const result = await analysePhoto(uri);
+      setAnalysis(result);
+      setStage('result');
+
+      // Try-on runs after the result is already on screen — 25s of dead air is
+      // what kills a demo, not the wait itself.
+      generateTryOn(uri, result.outfit)
+        .then(setTryOn)
+        .catch((err) => setTryOnError(err instanceof Error ? err.message : 'Try-on failed'));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not read that photo');
+      setStage('error');
+    }
   }, []);
 
   const body = () => {
-    if (stage === 'permission') {
-      return <PermissionScreen permission={permission} onScan={startScan} />;
+    if (stage === 'permission') return <PermissionScreen permission={permission} onScan={start} />;
+    if (stage === 'pick') {
+      return <PickPhotoScreen onPick={onPick} onCamera={() => setStage('camera')} />;
     }
-
-    if (scan.phase === 'scanning' || scan.phase === 'idle') {
-      return <ScanningScreen done={scan.progress.done} total={scan.progress.total} />;
+    if (stage === 'camera') {
+      return <CameraScreen onCapture={onPick} onClose={() => setStage('pick')} />;
     }
-
-    if (scan.phase === 'error') {
+    if (stage === 'analysing') return <ScanningScreen done={0} total={0} />;
+    if (stage === 'error') {
       return (
         <MessageScreen
           tone="error"
-          title="Couldn't read your screenshots"
-          detail={scan.error ?? undefined}
-          actionLabel="Try again"
-          onAction={rescan}
+          title="Couldn't read that photo"
+          detail={error ?? undefined}
+          actionLabel="Try another"
+          onAction={restart}
         />
       );
     }
-
-    if (scan.phase === 'empty') {
+    if (analysis && photo) {
       return (
-        <MessageScreen
-          title="No screenshots found."
-          detail="Nothing to answer for."
-          actionLabel="Scan again"
-          onAction={rescan}
+        <StyleResultScreen
+          original={photo}
+          analysis={analysis}
+          tryOn={tryOn}
+          tryOnError={tryOnError}
+          onRestart={restart}
         />
       );
     }
-
-    if (stage === 'executing') {
-      return <ExecutingScreen steps={buildSteps(scan.items)} onDone={finishExecuting} />;
-    }
-
-    if (stage === 'results') {
-      return (
-        <ResultsScreen
-          items={scan.items}
-          outcomes={outcomes}
-          totalValue={scan.totalValue}
-          onRescan={rescan}
-        />
-      );
-    }
-
-    return (
-      <VerdictScreen
-        totalScreenshots={scan.totalScreenshots}
-        counts={scan.counts}
-        verdictLine={scan.verdictLine}
-        actionable={actionableCount(scan.items)}
-        onFix={() => setStage('executing')}
-      />
-    );
+    return <PermissionScreen permission={permission} onScan={start} />;
   };
 
   return (

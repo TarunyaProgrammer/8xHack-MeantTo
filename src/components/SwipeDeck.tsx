@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Image,
@@ -31,7 +31,7 @@ interface Props {
 
 /** How far a card must travel before release counts as a dismiss. */
 const THROW_RATIO = 0.28;
-/** Cards drawn behind the active one. Beyond three nothing is visible. */
+/** Cards visible behind the active one. Beyond three nothing shows through. */
 const VISIBLE = 3;
 
 /**
@@ -50,17 +50,50 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
   const { width } = useWindowDimensions();
   const [top, setTop] = useState(0);
 
-  const pan = useRef(new Animated.ValueXY()).current;
   const cardW = Math.round(width * 0.84);
   const cardH = Math.round(cardW * 1.45);
 
-  const advance = useCallback(() => {
-    // Order matters: promote first, then recentre. Recentring while the thrown
-    // card is still the top one snaps it back into frame for a beat before the
-    // content changes under it.
-    setTop((t) => (t + 1) % items.length);
-    pan.setValue({ x: 0, y: 0 });
-  }, [items.length, pan]);
+  /**
+   * Cards are absolutely positioned, so the container has to reserve their
+   * full height itself — the image plus the meta block beneath it (label,
+   * two-line caption and the Shop action), plus the offset of the deepest
+   * card in the stack. Sizing this to the image alone let the cards overhang
+   * whatever came next on the page.
+   */
+  const metaH = 152;
+  const stackOffset = (VISIBLE - 1) * 14;
+  const deckH = cardH + metaH + stackOffset;
+  const count = items.length;
+
+  /**
+   * One animated value per card, keyed by look, rather than one shared by the
+   * deck.
+   *
+   * A shared value has to be recentred when the next card is promoted, and
+   * that recentre necessarily lands while the thrown card is still the one
+   * bound to it — so the card snaps back into frame for a frame before the
+   * promotion renders. Ordering the two statements cannot fix it, because
+   * `setTop` is a batched React update while `setValue` writes to the view
+   * immediately; the reset always wins the race.
+   *
+   * With a value per card there is nothing to recentre: the thrown card keeps
+   * its own offset, and the promoted card is already sitting at rest.
+   */
+  const pans = useRef(new Map<string, Animated.ValueXY>()).current;
+  const panFor = useCallback(
+    (key: string): Animated.ValueXY => {
+      let value = pans.get(key);
+      if (!value) {
+        value = new Animated.ValueXY();
+        pans.set(key, value);
+      }
+      return value;
+    },
+    [pans]
+  );
+
+  const activeKey = count > 0 ? items[top % count].key : '';
+  const pan = panFor(activeKey);
 
   const responder = useMemo(
     () =>
@@ -82,7 +115,7 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
               // Matches onPanResponderMove, which cannot use the native driver
               // because Animated.event writes to the value from JS.
               useNativeDriver: false,
-            }).start(advance);
+            }).start(() => setTop((t) => (t + 1) % count));
             return;
           }
           Animated.spring(pan, {
@@ -93,8 +126,27 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
           }).start();
         },
       }),
-    [advance, pan, width]
+    [count, pan, width]
   );
+
+  /**
+   * Recentre a card only after it has left the front.
+   *
+   * The thrown card keeps its offset until this runs, so it never snaps back
+   * into frame. By the time the effect fires the promotion has rendered and
+   * the card is buried at the back of the stack at opacity 0, so moving it is
+   * invisible — and it is back at rest for when it cycles round to the front.
+   *
+   * Driven off the committed `top` rather than a frame callback, so it cannot
+   * race the React update the way a `requestAnimationFrame` reset would.
+   */
+  const wasTop = useRef(top);
+  useEffect(() => {
+    if (wasTop.current === top || count === 0) return;
+    const left = items[wasTop.current % count];
+    wasTop.current = top;
+    if (left) panFor(left.key).setValue({ x: 0, y: 0 });
+  }, [top, items, count, panFor]);
 
   const rotate = pan.x.interpolate({
     inputRange: [-width, 0, width],
@@ -110,16 +162,29 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
   });
 
   return (
-    <View style={{ height: cardH + 132, alignItems: 'center', justifyContent: 'flex-start' }}>
-      {Array.from({ length: Math.min(VISIBLE, items.length) }, (_, depth) => depth)
+    <View style={{ height: deckH, alignItems: 'center', justifyContent: 'flex-start' }}>
+      {/*
+        * Every card stays mounted, not just the three that show.
+        *
+        * Rendering a window of three meant that each promotion unmounted the
+        * card leaving the window and mounted the one entering it. The new card
+        * mounted with an empty Image, which then had to load its file from
+        * disk — so a card popped in at the back of the stack on every swipe.
+        * Six mounted Images cost little and never reload.
+        */}
+      {Array.from({ length: count }, (_, depth) => depth)
         // Furthest first, so the active card ends up last and therefore on top.
         .reverse()
         .map((depth) => {
-          const item = items[(top + depth) % items.length];
+          const item = items[(top + depth) % count];
           const active = depth === 0;
+          // Cards past the visible depth are held at the back rest position
+          // and faded out. They keep their images; they just do not show.
+          const buried = depth >= VISIBLE;
+          const tier = Math.min(depth, VISIBLE - 1);
 
-          const restScale = 1 - depth * 0.05;
-          const restY = depth * 14;
+          const restScale = 1 - tier * 0.05;
+          const restY = tier * 14;
 
           const style = active
             ? {
@@ -160,9 +225,11 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
                 // Explicit stacking. With stable keys React reorders these
                 // views rather than rebuilding them, so draw order can no
                 // longer be inferred from position in the JSX.
-                { width: cardW, zIndex: VISIBLE - depth, elevation: VISIBLE - depth },
+                { width: cardW, zIndex: count - depth, elevation: count - depth },
+                buried && styles.buried,
                 style,
               ]}
+              pointerEvents={active ? 'auto' : 'none'}
               {...(active ? responder.panHandlers : {})}
             >
               <Pressable onPress={() => active && onOpen((top + depth) % items.length)}>
@@ -211,6 +278,8 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
 
 const styles = StyleSheet.create({
   layer: { position: 'absolute', top: 0 },
+  // Mounted, positioned, and invisible — the image stays decoded and ready.
+  buried: { opacity: 0 },
   card: {
     borderRadius: radius.card,
     backgroundColor: color.surface,

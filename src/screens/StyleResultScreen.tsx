@@ -146,7 +146,7 @@ export function StyleResultScreen({ original, analysis, tryOns, tryOnErrors, sel
           }))}
         />
 
-        <GhostButton label="Try another photo" onPress={onRestart} />
+        <GhostButton label="Try another photo" onPress={onRestart} style={{ marginTop: space.md }} />
       </ScrollView>
     </Screen>
   );

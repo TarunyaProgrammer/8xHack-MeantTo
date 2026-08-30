@@ -9,6 +9,7 @@ import Animated, {
   type SharedValue,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { Icon } from './Icon';
 import { Shimmer } from './Shimmer';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
@@ -94,7 +95,7 @@ export function LookDeck({ items, original, onOpen, gutter }: Props) {
         {items.map((item, i) => (
           <View key={item.key} style={{ width: step, paddingHorizontal: gutter }}>
             <Anim scroll={scroll} index={i} cardW={step}>
-              <Pressable onPress={() => onOpen(i)} disabled={!item.image}>
+              <Pressable onPress={() => onOpen(i)}>
                 <View style={[styles.card, { width: cardW }]}>
                 {item.image ? (
                   <Animated.Image
@@ -122,6 +123,13 @@ export function LookDeck({ items, original, onOpen, gutter }: Props) {
                     <Text style={[type.body, { fontWeight: '700', marginTop: 4 }]} numberOfLines={2}>
                       {item.caption}
                     </Text>
+
+                    {/* An explicit action. The card was tappable before, but
+                        nothing on it said so, so the shop links were invisible. */}
+                    <View style={styles.cta}>
+                      <Text style={styles.ctaText}>Shop this look</Text>
+                      <Icon name="link" size={14} color={color.onAccent} strokeWidth={2.4} />
+                    </View>
                   </View>
                 </View>
               </Pressable>
@@ -147,6 +155,17 @@ const styles = StyleSheet.create({
   },
   fallback: { backgroundColor: color.surfaceHi, alignItems: 'center', justifyContent: 'center' },
   meta: { padding: space.md },
+  cta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    marginTop: space.md,
+    paddingVertical: 13,
+    borderRadius: radius.button,
+    backgroundColor: color.accent,
+  },
+  ctaText: { color: color.onAccent, fontSize: 15, fontWeight: '800', letterSpacing: -0.2 },
   label: {
     fontSize: 10,
     fontWeight: '800',

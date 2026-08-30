@@ -17,7 +17,7 @@ export function LooksScreen({ looks, onOpen, onStart }: Props) {
   const tile = (width - space.lg * 2 - space.sm) / 2;
 
   return (
-    <Screen>
+    <Screen tabSafe>
       <Text style={type.caption}>Your history</Text>
       <Text style={[type.display, { marginTop: 6, marginBottom: space.lg }]}>LOOKS</Text>
 
@@ -32,14 +32,14 @@ export function LooksScreen({ looks, onOpen, onStart }: Props) {
           </Pressable>
         </Card>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120 }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space.md }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {looks.map((look, i) => (
               <Reveal key={look.id} index={i}>
                 <Pressable onPress={() => onOpen(look)}>
                   <Image
                     source={{
-                      uri: look.tryOn ? `data:image/png;base64,${look.tryOn}` : look.photo,
+                      uri: look.tryOn ?? look.photo,
                     }}
                     style={{
                       width: tile,

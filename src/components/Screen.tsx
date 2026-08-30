@@ -2,21 +2,27 @@ import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { color, gutter } from '../theme/tokens';
+import { TAB_CLEARANCE } from './TabBar';
 
 interface Props {
   children: React.ReactNode;
   /** Centre content vertically — used by the permission and scanning screens. */
   center?: boolean;
+  /** Reserve room for the floating tab bar. */
+  tabSafe?: boolean;
   style?: ViewStyle;
 }
 
-export function Screen({ children, center, style }: Props) {
+export function Screen({ children, center, tabSafe, style }: Props) {
   const insets = useSafeAreaInsets();
   return (
     <View
       style={[
         styles.screen,
-        { paddingTop: insets.top + gutter, paddingBottom: insets.bottom + gutter },
+        {
+          paddingTop: insets.top + gutter,
+          paddingBottom: insets.bottom + gutter + (tabSafe ? TAB_CLEARANCE : 0),
+        },
         center && styles.center,
         style,
       ]}

@@ -91,8 +91,8 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
   const garments = React.useMemo(() => garmentsFrom(analysis.outfit), [analysis.outfit]);
 
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: 110 }}>
+    <Screen tabSafe>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md }}>
         <View>
           <Text style={type.caption}>Your season</Text>
           <Text style={[type.mega, { marginTop: 6 }]}>{analysis.season.toUpperCase()}</Text>
@@ -106,7 +106,7 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
         <Card style={{ padding: space.sm }}>
           {tryOn ? (
             <Image
-              source={{ uri: `data:image/png;base64,${tryOn}` }}
+              source={{ uri: tryOn }}
               style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: radius.button }}
               resizeMode="cover"
             />

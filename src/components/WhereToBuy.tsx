@@ -1,11 +1,12 @@
 import React from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ActionSheetIOS, Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { PriceRangePicker } from './PriceRangePicker';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
-import { Garment, PriceBandId, ShopLink, openShopLink, shopLinks } from '../lib/shop';
+import { Garment, PriceBandId, openShopLink, shopLinks } from '../lib/shop';
 
 interface Props {
   garments: Garment[];
@@ -14,61 +15,64 @@ interface Props {
 }
 
 /**
- * Retailers sit in an equal-width segmented row rather than free-floating
- * chips, so every garment block shares one vertical rhythm and the row edges
- * line up down the card.
+ * One compact row per garment. Retailers live behind a native picker rather
+ * than three inline buttons — showing every retailer for every garment tripled
+ * the height of this card for no added meaning, and made the screen scroll.
  */
-function RetailerRow({ links }: { links: ShopLink[] }) {
-  return (
-    <View style={styles.retailers}>
-      {links.map((link, i) => (
-        <Pressable
-          key={link.retailer}
-          accessibilityRole="link"
-          accessibilityLabel={`${link.retailer}, opens a search`}
-          onPress={() => openShopLink(link.url)}
-          style={({ pressed }) => [
-            styles.retailer,
-            i > 0 && styles.retailerDivider,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={styles.retailerLabel} numberOfLines={1}>
-            {link.retailer}
-          </Text>
-          <Icon name="link" size={12} color={color.accent} strokeWidth={2.2} />
-        </Pressable>
-      ))}
-    </View>
-  );
+function chooseRetailer(description: string, band: PriceBandId) {
+  const links = shopLinks(description, band);
+  const names = links.map((l) => l.retailer);
+
+  if (Platform.OS === 'ios') {
+    ActionSheetIOS.showActionSheetWithOptions(
+      { options: [...names, 'Cancel'], cancelButtonIndex: names.length, title: description },
+      (i) => {
+        if (i < names.length) openShopLink(links[i].url);
+      }
+    );
+    return;
+  }
+
+  Alert.alert('Shop this', description, [
+    ...links.map((l) => ({ text: l.retailer, onPress: () => openShopLink(l.url) })),
+    { text: 'Cancel', style: 'cancel' as const },
+  ]);
 }
 
-/**
- * Every row opens a real, price-filtered search on the retailer's own site.
- * No price is ever shown here — we have no product data, and inventing one
- * would be a lie to the user.
- */
 export function WhereToBuy({ garments, band, onChangeBand }: Props) {
   if (garments.length === 0) return null;
 
   return (
-    <Card>
+    <Card style={{ padding: space.md }}>
       <View style={styles.header}>
-        <Text style={type.caption}>Where to buy</Text>
-        <Text style={styles.count}>{garments.length}</Text>
+        <Text style={type.caption}>Shop the look</Text>
+        <Text style={styles.count}>{garments.length} items</Text>
       </View>
 
       <PriceRangePicker value={band} onChange={onChangeBand} />
 
-      <View style={{ marginTop: space.lg }}>
+      <View style={{ marginTop: space.sm }}>
         {garments.map((garment, i) => (
-          <View key={garment.key} style={[styles.garment, i > 0 && styles.garmentDivider]}>
-            <Text style={styles.slot}>{garment.key}</Text>
-            <Text style={[type.body, { marginTop: 2 }]} numberOfLines={2}>
+          <Pressable
+            key={garment.key}
+            accessibilityRole="button"
+            accessibilityLabel={`Shop ${garment.description}`}
+            onPress={() => {
+              void Haptics.selectionAsync().catch(() => {});
+              chooseRetailer(garment.description, band);
+            }}
+            style={({ pressed }) => [
+              styles.row,
+              i > 0 && styles.divider,
+              pressed && styles.pressed,
+            ]}
+          >
+            <Text style={styles.slot}>{garment.key.slice(0, 3).toUpperCase()}</Text>
+            <Text style={[type.body, styles.name]} numberOfLines={1}>
               {garment.description}
             </Text>
-            <RetailerRow links={shopLinks(garment.description, band)} />
-          </View>
+            <Icon name="link" size={15} color={color.accent} strokeWidth={2.2} />
+          </Pressable>
         ))}
       </View>
     </Card>
@@ -80,41 +84,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: space.md,
+    marginBottom: space.sm,
   },
-  count: { fontSize: 11, fontWeight: '800', color: color.faint },
+  count: { fontSize: 11, fontWeight: '700', color: color.faint },
 
-  garment: { paddingBottom: space.md },
-  garmentDivider: {
-    borderTopWidth: 1,
-    borderTopColor: color.border,
-    paddingTop: space.md,
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: space.sm, paddingVertical: 11 },
+  divider: { borderTopWidth: 1, borderTopColor: color.border },
+  pressed: { opacity: 0.55 },
   slot: {
+    width: 30,
     fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 1.4,
-    textTransform: 'uppercase',
-    color: color.accent,
+    letterSpacing: 0.8,
+    color: color.faint,
   },
-
-  retailers: {
-    flexDirection: 'row',
-    marginTop: space.sm,
-    borderRadius: radius.tile,
-    borderWidth: 1,
-    borderColor: color.border,
-    overflow: 'hidden',
-  },
-  retailer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    paddingVertical: 11,
-  },
-  retailerDivider: { borderLeftWidth: 1, borderLeftColor: color.border },
-  pressed: { backgroundColor: color.surfaceHi },
-  retailerLabel: { fontSize: 13, fontWeight: '700', color: color.ink },
+  name: { flex: 1, fontWeight: '600' },
 });

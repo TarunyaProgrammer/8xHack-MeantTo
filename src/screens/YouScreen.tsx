@@ -32,8 +32,8 @@ export function YouScreen({ looks }: Props) {
   const topSeason = Object.entries(seasonCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
 
   return (
-    <Screen>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 120, gap: space.md }}>
+    <Screen tabSafe>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md }}>
         <View>
           <Text style={type.caption}>Profile</Text>
           <Text style={[type.display, { marginTop: 6 }]}>YOU</Text>

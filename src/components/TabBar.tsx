@@ -8,6 +8,13 @@ import { color, radius, space } from '../theme/tokens';
 
 export type TabId = 'style' | 'looks' | 'you';
 
+/**
+ * Vertical space the floating bar occupies. Every scrollable screen pads by
+ * this so content can never come to rest underneath it — three hand-tuned
+ * magic numbers is how buttons end up overlapping.
+ */
+export const TAB_CLEARANCE = 96;
+
 const TABS: { id: TabId; label: string; icon: IconName }[] = [
   { id: 'style', label: 'Style', icon: 'camera' },
   { id: 'looks', label: 'Looks', icon: 'link' },

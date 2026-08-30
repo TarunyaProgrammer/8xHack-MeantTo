@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { AuraBackground, Chip, GhostButton, PrimaryButton, Screen } from '../components';
+import { Chip, CollageMarquee, GhostButton, PrimaryButton, Screen } from '../components';
 import { color, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { PermissionState } from '../lib/screenshots';
@@ -46,7 +46,7 @@ export function PermissionScreen({ permission, onScan, onCamera }: Props) {
 
   return (
     <Screen center>
-      <AuraBackground />
+      <CollageMarquee />
 
       <Animated.View entering={FadeInDown.duration(600).springify().damping(18)}>
         <Chip label="Colour · Fit · Try-on" tone="accent" />

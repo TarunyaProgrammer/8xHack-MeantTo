@@ -20,7 +20,7 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
   }, []);
 
   return (
-    <Screen>
+    <Screen tabSafe>
       <Text style={type.caption}>Step one</Text>
       <Text style={[type.display, { marginTop: 6 }]}>FULL{'\n'}BODY</Text>
       <Text style={[type.bodyMuted, { marginTop: space.sm, marginBottom: space.lg }]}>
@@ -80,7 +80,7 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
         label="Style me"
         disabled={!selected}
         onPress={() => selected && onPick(selected)}
-        style={{ marginTop: space.md, marginBottom: 78 }}
+        style={{ marginTop: space.md }}
       />
     </Screen>
   );

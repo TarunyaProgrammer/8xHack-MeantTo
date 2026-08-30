@@ -1,4 +1,4 @@
-export { AuraBackground } from './AuraBackground';
+export { CollageMarquee } from './CollageMarquee';
 export { Card } from './Card';
 export { Chip } from './Chip';
 export { CountUp } from './CountUp';

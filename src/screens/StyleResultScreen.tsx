@@ -107,8 +107,16 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
 
         <Card>
           <Text style={type.h2}>{analysis.outfit.top}</Text>
-          <Text style={[type.body, { color: color.muted }]}>{analysis.outfit.bottom}</Text>
-          <Text style={[type.body, { color: color.muted }]}>{analysis.outfit.shoes}</Text>
+          {/* Read loosely: the analysis schema may gain or rename garment slots,
+              and anything the try-on renders must also be named here. */}
+          {(['bottom', 'shoes', 'outerwear', 'accessory'] as const)
+            .map((slot) => (analysis.outfit as Record<string, unknown>)[slot])
+            .filter((v): v is string => typeof v === 'string' && v.trim() !== '')
+            .map((line) => (
+              <Text key={line} style={[type.body, { color: color.muted }]}>
+                {line}
+              </Text>
+            ))}
           <Text style={[type.bodyMuted, { fontSize: 14, marginTop: space.sm }]}>
             {analysis.outfit.why}
           </Text>

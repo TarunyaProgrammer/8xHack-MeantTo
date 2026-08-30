@@ -9,22 +9,16 @@ interface Props {
   looks: Look[];
   onOpen: (look: Look) => void;
   onStart: () => void;
-  onBack: () => void;
 }
 
 /** Only real saved looks. An empty history renders as empty. */
-export function LooksScreen({ looks, onOpen, onStart, onBack }: Props) {
+export function LooksScreen({ looks, onOpen, onStart }: Props) {
   const { width } = useWindowDimensions();
   const tile = (width - space.lg * 2 - space.sm) / 2;
 
   return (
     <Screen>
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={type.caption}>Your history</Text>
-          <Pressable onPress={onBack} hitSlop={10}>
-            <Chip label="Back" />
-          </Pressable>
-        </View>
+      <Text style={type.caption}>Your history</Text>
       <Text style={[type.display, { marginTop: 6, marginBottom: space.lg }]}>Your looks</Text>
 
       {looks.length === 0 ? (

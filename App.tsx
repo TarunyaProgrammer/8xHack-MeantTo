@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { BackHandler } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { PermissionScreen } from './src/screens/PermissionScreen';
@@ -158,13 +159,46 @@ export default function App() {
     );
   };
 
+  /**
+   * A single back rule for the app. Android's edge-swipe gesture and the
+   * hardware button both come through here, so this is what makes the swipe
+   * navigate instead of dropping the user out of the app.
+   *
+   * Returning true means handled; false lets the OS close the app, which is
+   * only correct on the landing screen.
+   */
+  const goBack = useCallback((): boolean => {
+    if (page !== 'flow') {
+      setPage('flow');
+      return true;
+    }
+    if (stage === 'camera' || stage === 'error') {
+      setStage('pick');
+      return true;
+    }
+    if (stage === 'result') {
+      restart();
+      return true;
+    }
+    if (stage === 'pick') {
+      setStage('permission');
+      return true;
+    }
+    // Landing: nothing above us, so let the OS take it.
+    return false;
+  }, [page, stage, restart]);
+
+  useEffect(() => {
+    const sub = BackHandler.addEventListener('hardwareBackPress', goBack);
+    return () => sub.remove();
+  }, [goBack]);
+
   const body = () => {
     if (page === 'looks') {
       return (
         <LooksScreen
           looks={looks}
           onOpen={openLook}
-          onBack={() => setPage('flow')}
           onStart={() => {
             setPage('flow');
             setStage('pick');
@@ -172,7 +206,7 @@ export default function App() {
         />
       );
     }
-    if (page === 'you') return <YouScreen looks={looks} onBack={() => setPage('flow')} />;
+    if (page === 'you') return <YouScreen looks={looks} />;
     return styleFlow();
   };
 

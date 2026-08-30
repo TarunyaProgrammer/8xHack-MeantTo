@@ -1,11 +1,12 @@
-import React from 'react';
-import { ActionSheetIOS, Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { Card } from './Card';
 import { Icon } from './Icon';
 import { PriceRangePicker } from './PriceRangePicker';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
+import { ShopSheet } from './ShopSheet';
 import { Garment, PriceBandId, openShopLink, shopLinks } from '../lib/shop';
 
 interface Props {
@@ -15,31 +16,13 @@ interface Props {
 }
 
 /**
- * One compact row per garment. Retailers live behind a native picker rather
+ * One compact row per garment. Retailers live behind an in-app sheet rather
  * than three inline buttons — showing every retailer for every garment tripled
- * the height of this card for no added meaning, and made the screen scroll.
+ * the height of this card for no added meaning.
  */
-function chooseRetailer(description: string, band: PriceBandId) {
-  const links = shopLinks(description, band);
-  const names = links.map((l) => l.retailer);
-
-  if (Platform.OS === 'ios') {
-    ActionSheetIOS.showActionSheetWithOptions(
-      { options: [...names, 'Cancel'], cancelButtonIndex: names.length, title: description },
-      (i) => {
-        if (i < names.length) openShopLink(links[i].url);
-      }
-    );
-    return;
-  }
-
-  Alert.alert('Shop this', description, [
-    ...links.map((l) => ({ text: l.retailer, onPress: () => openShopLink(l.url) })),
-    { text: 'Cancel', style: 'cancel' as const },
-  ]);
-}
-
 export function WhereToBuy({ garments, band, onChangeBand }: Props) {
+  const [open, setOpen] = useState<Garment | null>(null);
+
   if (garments.length === 0) return null;
 
   return (
@@ -59,7 +42,7 @@ export function WhereToBuy({ garments, band, onChangeBand }: Props) {
             accessibilityLabel={`Shop ${garment.description}`}
             onPress={() => {
               void Haptics.selectionAsync().catch(() => {});
-              chooseRetailer(garment.description, band);
+              setOpen(garment);
             }}
             style={({ pressed }) => [
               styles.row,
@@ -75,6 +58,16 @@ export function WhereToBuy({ garments, band, onChangeBand }: Props) {
           </Pressable>
         ))}
       </View>
+      <ShopSheet
+        visible={open !== null}
+        title={open?.description ?? ''}
+        links={open ? shopLinks(open.description, band) : []}
+        onPick={(url) => {
+          setOpen(null);
+          openShopLink(url);
+        }}
+        onClose={() => setOpen(null)}
+      />
     </Card>
   );
 }

@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
   Easing,
 } from 'react-native-reanimated';
-import { Chip, CollageMarquee, GhostButton, PrimaryButton, Screen } from '../components';
+import { Card, Chip, CollageMarquee, GhostButton, PrimaryButton, Screen } from '../components';
 import { color, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { PermissionState } from '../lib/screenshots';
@@ -52,6 +52,10 @@ export function PermissionScreen({ permission, onScan, onCamera }: Props) {
         <Chip label="Colour · Fit · Try-on" tone="accent" />
       </Animated.View>
 
+      {/* Type sits on a solid panel rather than straight on the photography.
+          A translucent wash alone cannot guarantee contrast when the imagery
+          behind it is moving and unpredictable. */}
+
       <Animated.View style={float}>
         <Animated.Text
           entering={FadeInDown.delay(90).duration(600).springify().damping(18)}
@@ -69,15 +73,15 @@ export function PermissionScreen({ permission, onScan, onCamera }: Props) {
       </Animated.Text>
 
       {/* Fixed height so a longer quote cannot shift the button under the user's thumb. */}
-      <View style={{ height: 92, justifyContent: 'center', marginTop: space.xl }}>
-        <Animated.View key={q} entering={FadeIn.duration(600)} exiting={FadeOut.duration(300)}>
-          <View style={{ width: 3, height: 22, backgroundColor: color.hot, marginBottom: space.sm }} />
-          <Text style={[type.h2, { lineHeight: 26 }]}>{quote.text}</Text>
-          {quote.by && (
-            <Text style={[type.caption, { marginTop: 6 }]}>{quote.by}</Text>
-          )}
-        </Animated.View>
-      </View>
+      <Card style={{ marginTop: space.lg, paddingVertical: space.md }}>
+        <View style={{ height: 86, justifyContent: 'center' }}>
+          <Animated.View key={q} entering={FadeIn.duration(600)} exiting={FadeOut.duration(300)}>
+            <View style={{ width: 3, height: 20, backgroundColor: color.hot, marginBottom: space.xs }} />
+            <Text style={[type.h2, { lineHeight: 25 }]}>{quote.text}</Text>
+            {quote.by && <Text style={[type.caption, { marginTop: 6 }]}>{quote.by}</Text>}
+          </Animated.View>
+        </View>
+      </Card>
 
       <Animated.View entering={FadeInDown.delay(240).duration(600)} style={{ marginTop: space.lg }}>
         {blocked ? (

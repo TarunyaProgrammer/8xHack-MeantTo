@@ -83,8 +83,10 @@ export function CollageMarquee() {
         <Column images={[2, 5, 4]} width={col} speed={31000} up={false} />
         <Column images={[4, 1, 5]} width={col} speed={36000} up />
       </View>
-      {/* Paper wash so the type below always clears the contrast floor. */}
+      {/* Two-stage wash: an overall lift, then a heavier band across the lower
+          half where the headline, quote and action sit. */}
       <View style={styles.veil} />
+      <View style={styles.veilStrong} />
     </View>
   );
 }
@@ -96,5 +98,13 @@ const styles = StyleSheet.create({
     gap: space.sm,
     transform: [{ rotate: '-8deg' }, { scale: 1.35 }],
   },
-  veil: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(247,242,234,0.82)' },
+  veil: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(247,242,234,0.72)' },
+  veilStrong: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: '18%',
+    bottom: 0,
+    backgroundColor: 'rgba(247,242,234,0.9)',
+  },
 });

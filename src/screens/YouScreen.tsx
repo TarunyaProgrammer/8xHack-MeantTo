@@ -1,6 +1,7 @@
 import React from 'react';
 import { ScrollView, Text, View } from 'react-native';
 import { Card, Chip, Reveal, Screen } from '../components';
+import { TAB_CLEARANCE } from '../components/TabBar';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Look } from '../lib/looks';
@@ -32,8 +33,8 @@ export function YouScreen({ looks }: Props) {
   const topSeason = Object.entries(seasonCounts).sort((a, b) => b[1] - a[1])[0]?.[0];
 
   return (
-    <Screen tabSafe>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md }}>
+    <Screen>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: TAB_CLEARANCE }}>
         <View>
           <Text style={type.caption}>Profile</Text>
           <Text style={[type.display, { marginTop: 6 }]}>YOU</Text>

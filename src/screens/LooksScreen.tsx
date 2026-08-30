@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { Card, Chip, Reveal, Screen } from '../components';
+import { TAB_CLEARANCE } from '../components/TabBar';
 import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { Look } from '../lib/looks';
@@ -17,7 +18,7 @@ export function LooksScreen({ looks, onOpen, onStart }: Props) {
   const tile = (width - space.lg * 2 - space.sm) / 2;
 
   return (
-    <Screen tabSafe>
+    <Screen>
       <Text style={type.caption}>Your history</Text>
       <Text style={[type.display, { marginTop: 6, marginBottom: space.lg }]}>LOOKS</Text>
 
@@ -32,7 +33,7 @@ export function LooksScreen({ looks, onOpen, onStart }: Props) {
           </Pressable>
         </Card>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: space.md }}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: TAB_CLEARANCE }}>
           <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
             {looks.map((look, i) => (
               <Reveal key={look.id} index={i}>

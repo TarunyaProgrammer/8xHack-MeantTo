@@ -8,7 +8,11 @@ interface Props {
   children: React.ReactNode;
   /** Centre content vertically — used by the permission and scanning screens. */
   center?: boolean;
-  /** Reserve room for the floating tab bar. */
+  /**
+   * Reserve room for the floating tab bar. Only for screens whose content is
+   * NOT scrollable — a scroll view should pad its own content instead, so the
+   * list scrolls under the bar rather than stopping short of it.
+   */
   tabSafe?: boolean;
   style?: ViewStyle;
 }

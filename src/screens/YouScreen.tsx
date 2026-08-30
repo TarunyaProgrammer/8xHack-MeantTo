@@ -37,7 +37,7 @@ export function YouScreen({ looks }: Props) {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: TAB_CLEARANCE }}>
         <View>
           <Text style={type.caption}>Profile</Text>
-          <Text style={[type.display, { marginTop: 6 }]}>YOU</Text>
+          <Text style={[type.display, { marginTop: 6 }]}>You</Text>
         </View>
 
         {!latest ? (

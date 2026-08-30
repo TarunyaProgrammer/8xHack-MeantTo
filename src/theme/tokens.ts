@@ -1,52 +1,52 @@
 /**
- * Design tokens — warm, light, editorial.
+ * Design tokens — monochrome UI, colour from photography.
  *
- * The background is bone rather than pure white. Pure #FFF plus grey text is
- * the single most generic combination in mobile design; a warm paper tone with
- * near-black ink reads as considered and costs nothing in contrast.
+ * The reference this is built to has no accent colour at all: black pills,
+ * white cards, cool grey ground. All the colour comes from the imagery. That
+ * restraint is what reads as premium — an accent hue competing with product
+ * photography is what makes an interface look cheap.
  */
 
 export const color = {
-  /** Warm bone. The canvas. */
-  bg: '#F7F2EA',
-  /** Cards lift off the canvas by being cleaner and brighter than it. */
+  /** Cool light grey. Not warm cream — warmth fights photography. */
+  bg: '#EFEFEC',
   surface: '#FFFFFF',
-  /** Recessed wells, inactive segments. */
-  surfaceHi: '#EDE5D8',
+  /** Recessed wells and inactive segments. */
+  surfaceHi: '#E4E4DF',
 
-  /** Warm near-black. Never pure #000 — it reads harsh on paper tones. */
-  ink: '#17140F',
-  muted: '#7A7167',
-  faint: '#A79C8E',
+  ink: '#0E0E0E',
+  muted: '#6E6E6E',
+  faint: '#9C9C98',
 
-  /**
-   * Retail pink. The colour Indian shopping apps converge on because it reads
-   * as "act now" at a glance — cobalt is calm, and calm is the wrong register
-   * for a buy button.
-   */
-  accent: '#FF3F6C',
-  /** Marigold. Prices, badges, anything that should catch the eye second. */
-  hot: '#FF8A00',
-  /** Deep grape, third voice for tags and secondary fills. */
-  violet: '#7B2CBF',
+  /** Black IS the action colour. Pills, active chips, primary buttons. */
+  accent: '#0E0E0E',
+  /** Inverse, for text and icons sitting on black. */
+  onAccent: '#FFFFFF',
 
-  success: '#0E9F6E',
-  danger: '#D92D20',
+  /** Used sparingly — a live value, a positive delta. Never a whole surface. */
+  hot: '#E4572E',
+  violet: '#2F6F4F',
 
-  border: '#E2D9C9',
-  borderHi: '#CFC3AE',
+  success: '#2F6F4F',
+  danger: '#C8372D',
+
+  border: '#E2E2DD',
+  borderHi: '#CFCFC9',
+
+  /** Scrim stops for hero imagery. */
+  scrimTop: 'rgba(12,14,12,0.72)',
+  scrimBottom: 'rgba(12,14,12,0.05)',
 } as const;
 
 /**
- * Deliberately sharp. Heavy rounding on every surface is what makes an
- * interface read as a generic template; editorial layouts are built on crisp
- * corners. Only chips stay fully round, because a pill is a shape with meaning.
+ * Generous and soft. The reference leans hard on large radii — sharp corners
+ * read as utilitarian, and this app is meant to feel considered.
  */
 export const radius = {
-  card: 10,
-  button: 12,
+  card: 26,
+  button: 999,
   chip: 999,
-  tile: 8,
+  tile: 22,
 } as const;
 
 export const space = {
@@ -58,21 +58,20 @@ export const space = {
   xxl: 48,
 } as const;
 
-/** Soft and warm-tinted. A neutral grey shadow on a warm ground looks dirty. */
 export const shadow = {
   card: {
-    shadowColor: '#4A3F2E',
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 3,
+    shadowColor: '#1A1A18',
+    shadowOpacity: 0.07,
+    shadowRadius: 22,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 4,
   },
   glow: {
-    shadowColor: color.accent,
-    shadowOpacity: 0.28,
-    shadowRadius: 18,
+    shadowColor: '#000000',
+    shadowOpacity: 0.22,
+    shadowRadius: 16,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 6,
+    elevation: 8,
   },
 } as const;
 

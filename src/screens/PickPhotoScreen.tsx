@@ -22,7 +22,7 @@ export function PickPhotoScreen({ onPick, onCamera }: Props) {
   return (
     <Screen tabSafe>
       <Text style={type.caption}>Step one</Text>
-      <Text style={[type.display, { marginTop: 6 }]}>FULL{'\n'}BODY</Text>
+      <Text style={[type.display, { marginTop: 6 }]}>Pick a photo</Text>
       <Text style={[type.bodyMuted, { marginTop: space.sm, marginBottom: space.lg }]}>
         Head to feet. Plain wall.
       </Text>

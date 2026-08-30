@@ -9,17 +9,17 @@ import { color } from './tokens';
 export const type = {
   /** Screen-owning headline. One per screen, never two. */
   mega: {
-    fontSize: 56,
-    lineHeight: 54,
-    fontWeight: '900',
-    letterSpacing: -2.5,
+    fontSize: 42,
+    lineHeight: 44,
+    fontWeight: '800',
+    letterSpacing: -1.6,
     color: color.ink,
   },
   display: {
-    fontSize: 40,
-    lineHeight: 40,
+    fontSize: 34,
+    lineHeight: 36,
     fontWeight: '800',
-    letterSpacing: -1.6,
+    letterSpacing: -1.2,
     color: color.ink,
   },
   h1: { fontSize: 28, lineHeight: 30, fontWeight: '800', letterSpacing: -0.8, color: color.ink },
@@ -30,16 +30,16 @@ export const type = {
   caption: {
     fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 1.6,
+    letterSpacing: 1.2,
     textTransform: 'uppercase',
     color: color.faint,
   },
   /** Oversized live numbers. */
   number: {
-    fontSize: 72,
-    lineHeight: 70,
-    fontWeight: '900',
-    letterSpacing: -4,
+    fontSize: 56,
+    lineHeight: 56,
+    fontWeight: '800',
+    letterSpacing: -2.4,
     color: color.ink,
   },
 } satisfies Record<string, TextStyle>;

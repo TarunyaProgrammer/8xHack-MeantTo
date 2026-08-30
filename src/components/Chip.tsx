@@ -10,7 +10,7 @@ interface Props {
 export function Chip({ label, tone = 'default' }: Props) {
   const fill =
     tone === 'accent' ? color.accent : tone === 'hot' ? color.hot : color.surfaceHi;
-  const ink = tone === 'default' ? color.muted : color.surface;
+  const ink = tone === 'default' ? color.muted : color.onAccent;
   return (
     <View style={[styles.chip, { backgroundColor: fill }]}>
       <Text style={[styles.label, { color: ink }]}>

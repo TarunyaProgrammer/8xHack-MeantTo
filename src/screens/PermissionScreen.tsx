@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Linking, Text, View } from 'react-native';
-import Animated, {
-  FadeIn,
-  FadeInDown,
-  FadeOut,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import { Card, Chip, CollageMarquee, GhostButton, PrimaryButton, Screen } from '../components';
-import { color, space } from '../theme/tokens';
+import { Linking, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn, FadeInDown, FadeOut } from 'react-native-reanimated';
+import { GhostButton, HeroImage, PrimaryButton } from '../components';
+import { color, radius, space } from '../theme/tokens';
 import { type } from '../theme/type';
 import { PermissionState } from '../lib/screenshots';
 import { QUOTES } from '../lib/quotes';
@@ -23,81 +15,114 @@ interface Props {
   onCamera: () => void;
 }
 
-/** A slow drift on the headline keeps the screen alive without asking for attention. */
-function useFloat() {
-  const t = useSharedValue(0);
-  useEffect(() => {
-    t.value = withRepeat(withTiming(1, { duration: 4200, easing: Easing.inOut(Easing.sin) }), -1, true);
-  }, [t]);
-  return useAnimatedStyle(() => ({ transform: [{ translateY: -4 + t.value * 8 }] }));
-}
-
 export function PermissionScreen({ permission, onScan, onCamera }: Props) {
   const blocked = permission === 'denied';
-  const float = useFloat();
+  const insets = useSafeAreaInsets();
   const [q, setQ] = useState(0);
 
   useEffect(() => {
-    const id = setInterval(() => setQ((n) => (n + 1) % QUOTES.length), 5200);
+    const id = setInterval(() => setQ((n) => (n + 1) % QUOTES.length), 5600);
     return () => clearInterval(id);
   }, []);
 
   const quote = QUOTES[q];
 
   return (
-    <Screen center>
-      <CollageMarquee />
+    <View style={styles.root}>
+      <HeroImage index={q} />
 
-      <Animated.View entering={FadeInDown.duration(600).springify().damping(18)}>
-        <Chip label="Colour · Fit · Try-on" tone="accent" />
-      </Animated.View>
+      <View style={[styles.content, { paddingTop: insets.top + space.xl, paddingBottom: insets.bottom + space.lg }]}>
+        <Animated.View entering={FadeInDown.duration(700).springify().damping(20)}>
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>Colour · Fit · Try-on</Text>
+          </View>
+          <Text style={styles.title}>Wear what{'\n'}actually suits you</Text>
+        </Animated.View>
 
-      {/* Type sits on a solid panel rather than straight on the photography.
-          A translucent wash alone cannot guarantee contrast when the imagery
-          behind it is moving and unpredictable. */}
+        <View style={{ flex: 1 }} />
 
-      <Animated.View style={float}>
-        <Animated.Text
-          entering={FadeInDown.delay(90).duration(600).springify().damping(18)}
-          style={[type.mega, { marginTop: space.md }]}
-        >
-          YOUR{'\n'}COLOURS
-        </Animated.Text>
-      </Animated.View>
-
-      <Animated.Text
-        entering={FadeInDown.delay(160).duration(600)}
-        style={[type.body, { color: color.muted, marginTop: space.sm }]}
-      >
-        One photo. Real answers.
-      </Animated.Text>
-
-      {/* Fixed height so a longer quote cannot shift the button under the user's thumb. */}
-      <Card style={{ marginTop: space.lg, paddingVertical: space.md }}>
-        <View style={{ height: 86, justifyContent: 'center' }}>
-          <Animated.View key={q} entering={FadeIn.duration(600)} exiting={FadeOut.duration(300)}>
-            <View style={{ width: 3, height: 20, backgroundColor: color.accent, marginBottom: space.xs }} />
-            <Text style={[type.h2, { lineHeight: 25 }]}>{quote.text}</Text>
-            {quote.by && <Text style={[type.caption, { marginTop: 6 }]}>{quote.by}</Text>}
+        {/* Fixed height so a longer quote cannot shift the card under the thumb. */}
+        <View style={{ height: 74, justifyContent: 'flex-end', marginBottom: space.md }}>
+          <Animated.View key={q} entering={FadeIn.duration(700)} exiting={FadeOut.duration(320)}>
+            <Text style={styles.quote}>“{quote.text}”</Text>
+            {quote.by && <Text style={styles.by}>{quote.by}</Text>}
           </Animated.View>
         </View>
-      </Card>
 
-      <Animated.View entering={FadeInDown.delay(240).duration(600)} style={{ marginTop: space.lg }}>
-        {blocked ? (
-          <>
-            <Text style={[type.bodyMuted, { marginBottom: space.md }]}>Photo access is off.</Text>
-            <PrimaryButton label="Take a photo instead" onPress={onCamera} />
-            <GhostButton
-              label="Open Settings"
-              onPress={() => Linking.openSettings()}
-              style={{ marginTop: space.sm }}
-            />
-          </>
-        ) : (
-          <PrimaryButton label="Start" onPress={onScan} />
-        )}
-      </Animated.View>
-    </Screen>
+        <Animated.View
+          entering={FadeInDown.delay(160).duration(700).springify().damping(20)}
+          style={styles.panel}
+        >
+          <Text style={styles.panelTitle}>One photo. Real answers.</Text>
+          <Text style={styles.panelBody}>
+            Your season, your palette, and a look put on you.
+          </Text>
+
+          {blocked ? (
+            <>
+              <PrimaryButton
+                label="Take a photo"
+                onPress={onCamera}
+                style={{ marginTop: space.md }}
+              />
+              <GhostButton
+                label="Open Settings"
+                onPress={() => Linking.openSettings()}
+                style={{ marginTop: space.xs }}
+              />
+            </>
+          ) : (
+            <PrimaryButton label="Start" onPress={onScan} style={{ marginTop: space.md }} />
+          )}
+        </Animated.View>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: color.ink },
+  content: { flex: 1, paddingHorizontal: space.lg },
+
+  badge: {
+    alignSelf: 'flex-start',
+    borderRadius: radius.chip,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.45)',
+    paddingHorizontal: space.sm,
+    paddingVertical: 6,
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+  },
+  title: {
+    color: '#FFFFFF',
+    fontSize: 42,
+    lineHeight: 44,
+    fontWeight: '800',
+    letterSpacing: -1.6,
+    marginTop: space.md,
+  },
+
+  quote: { color: 'rgba(255,255,255,0.94)', fontSize: 17, lineHeight: 23, fontWeight: '600' },
+  by: {
+    color: 'rgba(255,255,255,0.6)',
+    fontSize: 11,
+    fontWeight: '800',
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    marginTop: 6,
+  },
+
+  panel: {
+    backgroundColor: color.surface,
+    borderRadius: radius.card,
+    padding: space.lg,
+  },
+  panelTitle: { fontSize: 22, fontWeight: '800', letterSpacing: -0.6, color: color.ink },
+  panelBody: { fontSize: 15, lineHeight: 21, color: color.muted, marginTop: 6 },
+});

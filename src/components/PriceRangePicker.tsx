@@ -54,5 +54,5 @@ const styles = StyleSheet.create({
   chipActive: { backgroundColor: color.accent },
   pressed: { opacity: 0.6 },
   label: { fontSize: 13, fontWeight: '500', color: color.muted },
-  labelActive: { color: color.surface },
+  labelActive: { color: color.onAccent },
 });

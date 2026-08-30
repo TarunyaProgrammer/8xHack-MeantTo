@@ -15,8 +15,7 @@ interface Props {
 export function PrimaryButton({ label, onPress, disabled, loading, style, tone = 'accent' }: Props) {
   const inactive = disabled || loading;
   const fill = tone === 'hot' ? color.hot : color.accent;
-  // White on cobalt and on coral — both comfortably past the contrast floor.
-  const label_ = color.surface;
+  const label_ = color.onAccent;
 
   return (
     <Pressable
@@ -31,13 +30,13 @@ export function PrimaryButton({ label, onPress, disabled, loading, style, tone =
       style={({ pressed }) => [
         styles.button,
         { backgroundColor: inactive ? color.surfaceHi : fill },
-        !inactive && shadow.glow,
+
         pressed && !inactive && styles.pressed,
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={color.surface} />
+        <ActivityIndicator color={color.onAccent} />
       ) : (
         <Text style={[styles.label, { color: inactive ? color.faint : label_ }]}>{label}</Text>
       )}

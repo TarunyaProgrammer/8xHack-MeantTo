@@ -88,8 +88,8 @@
     "owner": "rakshit1256",
     "androidStatusBar": {
       "barStyle": "dark-content",
-      "backgroundColor": "#F7F2EA"
+      "backgroundColor": "#EFEFEC"
     },
-    "backgroundColor": "#F7F2EA"
+    "backgroundColor": "#EFEFEC"
   }
 }

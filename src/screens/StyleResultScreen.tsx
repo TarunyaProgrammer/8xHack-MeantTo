@@ -96,7 +96,7 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: space.md, paddingBottom: TAB_CLEARANCE }}>
         <View>
           <Text style={type.caption}>Your season</Text>
-          <Text style={[type.mega, { marginTop: 6 }]}>{analysis.season.toUpperCase()}</Text>
+          <Text style={[type.mega, { marginTop: 6 }]}>{analysis.season}</Text>
           <View style={{ flexDirection: 'row', gap: 6, marginTop: space.sm, flexWrap: 'wrap' }}>
             <Chip label={analysis.undertone} tone="accent" />
             <Chip label={`${analysis.contrast} contrast`} />

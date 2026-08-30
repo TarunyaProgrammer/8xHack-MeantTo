@@ -1,4 +1,4 @@
-export { CollageMarquee } from './CollageMarquee';
+export { HeroImage } from './HeroImage';
 export { Card } from './Card';
 export { Chip } from './Chip';
 export { CountUp } from './CountUp';

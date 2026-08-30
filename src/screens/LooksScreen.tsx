@@ -20,7 +20,7 @@ export function LooksScreen({ looks, onOpen, onStart }: Props) {
   return (
     <Screen>
       <Text style={type.caption}>Your history</Text>
-      <Text style={[type.display, { marginTop: 6, marginBottom: space.lg }]}>LOOKS</Text>
+      <Text style={[type.display, { marginTop: 6, marginBottom: space.lg }]}>Your looks</Text>
 
       {looks.length === 0 ? (
         <Card style={{ alignItems: 'flex-start' }}>

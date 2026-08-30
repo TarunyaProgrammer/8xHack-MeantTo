@@ -14,6 +14,7 @@
     "expo-calendar": "~15.0.8",
     "expo-clipboard": "~8.0.8",
     "expo-contacts": "~15.0.11",
+    "expo-dev-client": "~6.0.21",
     "expo-haptics": "~15.0.8",
     "expo-image-manipulator": "~14.0.8",
     "expo-linking": "~8.0.12",
@@ -29,6 +30,7 @@
   },
   "devDependencies": {
     "@types/react": "~19.1.0",
+    "eas-cli": "^23.0.0",
     "typescript": "~5.9.2"
   },
   "private": true

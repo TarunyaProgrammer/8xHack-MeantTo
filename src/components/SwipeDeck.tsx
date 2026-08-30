@@ -55,8 +55,11 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
   const cardH = Math.round(cardW * 1.45);
 
   const advance = useCallback(() => {
-    pan.setValue({ x: 0, y: 0 });
+    // Order matters: promote first, then recentre. Recentring while the thrown
+    // card is still the top one snaps it back into frame for a beat before the
+    // content changes under it.
     setTop((t) => (t + 1) % items.length);
+    pan.setValue({ x: 0, y: 0 });
   }, [items.length, pan]);
 
   const responder = useMemo(
@@ -145,8 +148,21 @@ export function SwipeDeck({ items, original, onOpen }: Props) {
 
           return (
             <Animated.View
-              key={`${item.key}-${depth}`}
-              style={[styles.layer, { width: cardW }, style]}
+              /*
+               * Keyed by the look alone, never by depth. Including depth meant
+               * a card promoted from second to first changed key, so React
+               * unmounted and rebuilt it — the image reloaded and the card
+               * visibly blinked out mid-swipe.
+               */
+              key={item.key}
+              style={[
+                styles.layer,
+                // Explicit stacking. With stable keys React reorders these
+                // views rather than rebuilding them, so draw order can no
+                // longer be inferred from position in the JSX.
+                { width: cardW, zIndex: VISIBLE - depth, elevation: VISIBLE - depth },
+                style,
+              ]}
               {...(active ? responder.panHandlers : {})}
             >
               <Pressable onPress={() => active && onOpen((top + depth) % items.length)}>

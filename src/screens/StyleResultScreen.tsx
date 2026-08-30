@@ -21,9 +21,29 @@ interface Props {
   onRestart: () => void;
 }
 
+
+/** Garment slots read loosely, so a schema change cannot blank the card. */
+const SLOTS: [label: string, key: string][] = [
+  ['Top', 'top'],
+  ['Bottom', 'bottom'],
+  ['Shoes', 'shoes'],
+  ['Layer', 'outerwear'],
+  ['Detail', 'accessory'],
+];
+
+function outfitRows(analysis: Analysis): { label: string; value: string }[] {
+  const outfit = analysis.outfit as Record<string, unknown>;
+  const rows: { label: string; value: string }[] = [];
+  for (const [label, key] of SLOTS) {
+    const value = outfit[key];
+    if (typeof value === 'string' && value.trim() !== '') rows.push({ label, value });
+  }
+  return rows;
+}
+
 function Swatches({ items }: { items: { hex: string; name: string }[] }) {
   return (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.xs }}>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm, justifyContent: 'space-between' }}>
       {items.map((c) => (
         <View key={c.hex + c.name} style={{ alignItems: 'center', width: 78 }}>
           <View
@@ -109,18 +129,43 @@ export function StyleResultScreen({ original, analysis, tryOn, tryOnError, onRes
 
         <Card hero>
           <Text style={type.caption}>The fit</Text>
-          <Text style={[type.h1, { marginTop: 6 }]}>{analysis.outfit.top}</Text>
-          {/* Read loosely: the analysis schema may gain or rename garment slots,
-              and anything the try-on renders must also be named here. */}
-          {(['bottom', 'shoes', 'outerwear', 'accessory'] as const)
-            .map((slot) => (analysis.outfit as Record<string, unknown>)[slot])
-            .filter((v): v is string => typeof v === 'string' && v.trim() !== '')
-            .map((line) => (
-              <Text key={line} style={[type.body, { color: color.muted }]}>
-                {line}
-              </Text>
+
+          {outfitRows(analysis).map((row, i) => (
+              <View
+                key={row.label}
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  gap: space.md,
+                  paddingVertical: space.sm,
+                  borderTopWidth: i === 0 ? 0 : 1,
+                  borderTopColor: color.border,
+                  marginTop: i === 0 ? space.sm : 0,
+                }}
+              >
+                <Text
+                  style={{
+                    width: 62,
+                    fontSize: 10,
+                    fontWeight: '800',
+                    letterSpacing: 1.2,
+                    textTransform: 'uppercase',
+                    color: color.faint,
+                    paddingTop: 3,
+                  }}
+                >
+                  {row.label}
+                </Text>
+                <Text style={[type.body, { flex: 1, fontWeight: '700' }]}>{row.value}</Text>
+              </View>
             ))}
-          <Text style={[type.bodyMuted, { fontSize: 14, marginTop: space.sm }]}>
+
+          <Text
+            style={[
+              type.bodyMuted,
+              { fontSize: 14, marginTop: space.md, paddingTop: space.md, borderTopWidth: 1, borderTopColor: color.border },
+            ]}
+          >
             {analysis.outfit.why}
           </Text>
         </Card>

@@ -13,17 +13,33 @@ interface Props {
   onChangeBand: (id: PriceBandId) => void;
 }
 
-function RetailerLink({ link }: { link: ShopLink }) {
+/**
+ * Retailers sit in an equal-width segmented row rather than free-floating
+ * chips, so every garment block shares one vertical rhythm and the row edges
+ * line up down the card.
+ */
+function RetailerRow({ links }: { links: ShopLink[] }) {
   return (
-    <Pressable
-      accessibilityRole="link"
-      accessibilityLabel={`${link.retailer}, opens a search`}
-      onPress={() => openShopLink(link.url)}
-      style={({ pressed }) => [styles.link, pressed && styles.pressed]}
-    >
-      <Text style={styles.linkLabel}>{link.retailer}</Text>
-      <Icon name="link" size={13} color={color.accent} strokeWidth={2} />
-    </Pressable>
+    <View style={styles.retailers}>
+      {links.map((link, i) => (
+        <Pressable
+          key={link.retailer}
+          accessibilityRole="link"
+          accessibilityLabel={`${link.retailer}, opens a search`}
+          onPress={() => openShopLink(link.url)}
+          style={({ pressed }) => [
+            styles.retailer,
+            i > 0 && styles.retailerDivider,
+            pressed && styles.pressed,
+          ]}
+        >
+          <Text style={styles.retailerLabel} numberOfLines={1}>
+            {link.retailer}
+          </Text>
+          <Icon name="link" size={12} color={color.accent} strokeWidth={2.2} />
+        </Pressable>
+      ))}
+    </View>
   );
 }
 
@@ -37,21 +53,21 @@ export function WhereToBuy({ garments, band, onChangeBand }: Props) {
 
   return (
     <Card>
-      <Text style={[type.caption, { marginBottom: space.sm }]}>Where to buy</Text>
+      <View style={styles.header}>
+        <Text style={type.caption}>Where to buy</Text>
+        <Text style={styles.count}>{garments.length}</Text>
+      </View>
 
       <PriceRangePicker value={band} onChange={onChangeBand} />
 
-      <View style={{ marginTop: space.md, gap: space.md }}>
-        {garments.map((garment) => (
-          <View key={garment.key} style={{ gap: space.xs }}>
-            <Text style={type.body} numberOfLines={2}>
+      <View style={{ marginTop: space.lg }}>
+        {garments.map((garment, i) => (
+          <View key={garment.key} style={[styles.garment, i > 0 && styles.garmentDivider]}>
+            <Text style={styles.slot}>{garment.key}</Text>
+            <Text style={[type.body, { marginTop: 2 }]} numberOfLines={2}>
               {garment.description}
             </Text>
-            <View style={styles.links}>
-              {shopLinks(garment.description, band).map((link) => (
-                <RetailerLink key={link.retailer} link={link} />
-              ))}
-            </View>
+            <RetailerRow links={shopLinks(garment.description, band)} />
           </View>
         ))}
       </View>
@@ -60,17 +76,45 @@ export function WhereToBuy({ garments, band, onChangeBand }: Props) {
 }
 
 const styles = StyleSheet.create({
-  links: { flexDirection: 'row', flexWrap: 'wrap', gap: space.xs },
-  link: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    borderRadius: radius.chip,
+    justifyContent: 'space-between',
+    marginBottom: space.md,
+  },
+  count: { fontSize: 11, fontWeight: '800', color: color.faint },
+
+  garment: { paddingBottom: space.md },
+  garmentDivider: {
+    borderTopWidth: 1,
+    borderTopColor: color.border,
+    paddingTop: space.md,
+  },
+  slot: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    color: color.accent,
+  },
+
+  retailers: {
+    flexDirection: 'row',
+    marginTop: space.sm,
+    borderRadius: radius.tile,
     borderWidth: 1,
     borderColor: color.border,
-    paddingHorizontal: space.sm,
-    paddingVertical: 7,
+    overflow: 'hidden',
   },
-  pressed: { opacity: 0.6 },
-  linkLabel: { fontSize: 13, fontWeight: '600', color: color.accent },
+  retailer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    paddingVertical: 11,
+  },
+  retailerDivider: { borderLeftWidth: 1, borderLeftColor: color.border },
+  pressed: { backgroundColor: color.surfaceHi },
+  retailerLabel: { fontSize: 13, fontWeight: '700', color: color.ink },
 });

@@ -1,97 +1,93 @@
-# Meant To
+# Fitted
 
-Your Screenshots folder is the biggest to-do list on your phone and it has no
-interface.
+Point your phone at a full-body photo. Get the colours that actually suit you,
+one specific outfit built from them, and a photoreal image of **you wearing it**.
 
-People screenshot things as a way of saying "deal with this later" — a wifi
-password, a number in a chat, an event poster, a product they meant to buy.
-Later never comes.
+Not another colour-analysis app that tells you you're a "Deep Autumn" and stops.
+The try-on is the product.
 
-Meant To reads that folder, tells you the truth about it, then empties it in
-one button by actually performing the actions.
+---
 
-> Your phone can already read one screenshot. This reads the four hundred you
-> forgot about.
+## What it does
 
-## How it works
+1. **Photo** — shoot one in-app or pick from your library
+2. **Analysis** — skin undertone, value, chroma, contrast, build and proportion,
+   mapped to one of the 12 seasonal colour types
+3. **Outfit** — one specific look derived from that: named garments, cuts,
+   fabrics and colours. Never "a nice top".
+4. **Try-on** — the same person, same face, same pose, wearing it
+5. **Shop** — each garment deep-links to a real, price-filtered search
 
-1. **Scan** — reads the Screenshots album (its own album on both platforms),
-   newest first, capped at 50.
-2. **Extract** — one vision call per screenshot into a strict schema. Seven
-   types: contact, event, wifi, place, link, reply owed, junk.
-3. **Verdict** — the real counts, in a big font, with a closing line.
-4. **Fix it** — one button runs every action in a visible cascade.
-5. **Results** — what changed, what's left.
+## The two hard parts
 
-## What actually happens when you press the button
+**Identity preservation.** Image edits regenerate faces by default — early
+versions returned a different human. Fixed with `input_fidelity: "high"` on
+`gpt-image-1.5`, verified by measuring pixel difference over the face region
+against the original: RMS dropped from 37.4 to ~7.
 
-| Type | Action | Real write |
+**Fashion reasoning.** The recommendation prompt is a six-step procedure —
+derive the season from undertone/value/chroma, let contrast govern how colours
+are *arranged*, apply line and proportion, then fabric and formality. Built from
+research across Sci\ART colour analysis, Permanent Style, Inside Out Style and
+NC State's body-shape study. It carries an explicit ban on the plain-tee default
+and a rotating brief so the same person doesn't get the same outfit twice.
+
+## No fabricated data
+
+Every value on screen traces to the user's real photo or real device data.
+
+- No mock mode, no seeded fixtures, no sample fallback
+- A failed analysis surfaces a visible error rather than a plausible-looking guess
+- **Prices are never invented.** We have no product API, so garments link to a
+  real filtered search and the retailer shows its own price. A convincing fake
+  number is worse than no number.
+
+## Shopping links
+
+| Retailer | Price filter | How it was verified |
 | --- | --- | --- |
-| contact | Saved to your Contacts | **Yes** |
-| event | Added to your Calendar | **Yes** |
-| wifi | Filed locally, latest copied to clipboard | Local |
-| place | Filed locally | Local |
-| link | Staged | Local |
-| reply owed | Drafted | Draft only |
+| Myntra | `rf=Price:<min>_<max>_<min> TO <max>` | Live result counts: 819 unfiltered → 455 / 294 / 69 across bands |
+| Amazon.in | `low-price` / `high-price` in rupees, plus `nodl=1` | A/B tested with a negative control |
+| Ajio | Fixed buckets, OR-ed by repeating `pricerange` | Read from Ajio's own facet JSON |
 
-Contacts and Calendar are genuine writes — open your own Contacts app
-afterwards and the entries are there.
+The obvious Myntra parameter (`f=Price_range:`) answers HTTP 200 while returning
+`totalCount: 0` — an empty page that looks like a working filter. Worth knowing
+if you ever build against it.
 
-**Messages are never sent.** Replies are drafted and left for you.
+Links open in an in-app browser rather than handing off to the retailer's app:
+all three register `handle_all_urls`, and their apps keep the search term while
+silently dropping the price parameters.
 
-## No placeholder data
+## Stack
 
-Every value on screen traces back to a real screenshot on the device. There is
-no mock mode, no demo mode, no seeded fixtures and no sample fallback.
+Expo SDK 54 · React Native 0.81 · TypeScript · Reanimated · react-native-svg
 
-- An empty album renders a real empty state
-- A failed extraction becomes `junk` and drops out of the counts — it is never
-  replaced with a plausible-looking guess
-- A missing API key throws and surfaces a visible error rather than silently
-  degrading to fabricated content
-- Counts are computed at runtime, never hardcoded
+SDK 54 specifically: Expo Go on the App Store stops there, so the project opens
+in stock Expo Go on any phone. Android needs a dev build regardless, because
+Expo Go can no longer grant full media-library access.
+
+The OpenAI API is called directly over `fetch`. Provider SDKs import Node
+builtins at module load, which Metro cannot resolve for React Native. Structured
+output still uses a strict JSON Schema generated from the zod schema, and every
+response is validated before use.
 
 ## Setup
 
 ```bash
 npm install
 cp .env.example .env      # add your OpenAI API key
-npx expo start
+npx expo start --dev-client
 ```
 
-Open in Expo Go. No development build is required.
+Android needs a development build for camera and media library:
 
-**Why SDK 54 and not the latest:** Expo Go on the App Store stops at SDK 54 —
-SDK 55 and later are not published there. Staying on 54 means the app opens in
-the stock Expo Go on any phone, including a judge's, with no provisioning
-profile or sideloaded APK.
-
-The key ships in the bundle via `EXPO_PUBLIC_AI_KEY`, which is acceptable for a
-demo build only. A real release puts it behind a proxy.
-
-## Stack
-
-Expo SDK 54 · React Native 0.81 · TypeScript · Reanimated · react-native-svg · zod
-
-Vision extraction runs on OpenAI `gpt-4o-mini` through the Chat Completions
-API, called directly over `fetch`. Official provider SDKs import Node builtins
-at module load, which Metro cannot resolve for React Native, so a small direct
-client is less fragile than shimming those. Structured output uses a strict
-JSON Schema generated from the zod schema, and every response is validated
-against it before use.
-
-Local-only persistence through AsyncStorage, keyed by MediaLibrary `assetId` so
-a screenshot is never extracted twice.
+```bash
+npx eas-cli build --platform android --profile development
+```
 
 ## Design
 
-White surfaces, a single accent, generous spacing, and as little text as the
-screen can carry. Icons are inline SVG — emoji are never used in the UI because
-they render inconsistently across platforms.
-
-## Known platform limits
-
-- iOS exposes no call or message history, so "you never replied" is not
-  computable
-- There is no API to write Apple Notes, so wifi passwords go to an in-app vault
-- SMS cannot be sent programmatically, which is why replies are drafts
+Monochrome UI, colour from photography. Black pills, white cards, cool grey
+ground — no accent hue competing with the imagery. Radius scales with element
+size. Icons are inline SVG; emoji are never used, because they render
+inconsistently across platforms.
